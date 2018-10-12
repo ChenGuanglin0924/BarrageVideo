@@ -1,0 +1,37 @@
+
+@font-face {font-family: "h5-video";
+  src: url('iconfont.eot?t=1539327449714'); /* IE9*/
+  src: url('iconfont.eot?t=1539327449714#iefix') format('embedded-opentype'), /* IE6-IE8 */
+  url('data:application/x-font-woff;charset=utf-8;base64,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') format('woff'),
+  url('iconfont.ttf?t=1539327449714') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+*/
+  url('iconfont.svg?t=1539327449714#h5-video') format('svg'); /* iOS 4.1- */
+}
+
+.h5-video {
+  font-family:"h5-video" !important;
+  font-size:16px;
+  font-style:normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.h5-video-volume-off:before { content: "\e6c3"; }
+
+.h5-video-volume-on:before { content: "\e6d9"; }
+
+.h5-video-barrage-setting:before { content: "\e6c2"; }
+
+.h5-video-fullscreen:before { content: "\e649"; }
+
+.h5-video-pause:before { content: "\e606"; }
+
+.h5-video-backward:before { content: "\e60a"; }
+
+.h5-video-mini-screen:before { content: "\e6c4"; }
+
+.h5-video-play:before { content: "\e608"; }
+
+.h5-video-settings:before { content: "\e64b"; }
+
+.h5-video-forward-copy:before { content: "\ec1f"; }
+
