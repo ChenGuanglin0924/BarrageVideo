@@ -4,9 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>BarrageVideo</title>
+    <link rel="stylesheet" href="./iconfont/iconfont.css">
+    <link rel="stylesheet" href="./BarrageVideo.css">
 </head>
 <body>
-    
+    <div class="video-container">
+        <video width="1000" height="600" src="">您的浏览器不支持 video 标签。</video>
+        <div class="video-control">
+            <div class="process-container">
+                <div class="cache-bar"></div>
+                <div class="play-bar"></div>
+                <div class="adjust-tool"></div>
+            </div>
+            <div class="control-container">
+                <div class="control-left">
+                    <!-- 播放/暂停 -->
+                    <div>
+                        <a class="play-tool h5-video-play"></a>
+                    </div>
+                    <!-- 时间控件 -->
+                    <div>
+                        <span class="time time-current">00:00</span>
+                        <span> / </span>
+                        <span class="time time-total">00:00</span>
+                    </div>
+                </div>
+                <div class="control-right">
+                    <!-- 弹幕开关 -->
+                    <div>
+                        <a class="barrage-tool"></a>
+                    </div>
+                    <!-- 音量控件 -->
+                    <div class="volume-container">
+                        <div class="volume-content">
+                            <div class="volume-value">60%</div>
+                            <div class="volume-slider-bg">
+                                <div class="volume-slider"></div>
+                            </div>
+                        </div>
+                        <a class="volume-tool h5-video-volume-on"></a>
+                    </div>
+                    <!-- 设置控件 -->
+                    <div>
+                        <div class="setting-content"></div>
+                        <a class="setting-tool h5-video-settings"></a>
+                    </div>
+                    <!-- 全屏/非全屏 -->
+                    <div>
+                        <a class="fullscreen-tool h5-video-fullscreen"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
+<script src="./BarrageVideo.js" async></script>
 </html>

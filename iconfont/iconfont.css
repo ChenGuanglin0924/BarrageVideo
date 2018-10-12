@@ -7,7 +7,7 @@
   url('iconfont.svg?t=1539327449714#h5-video') format('svg'); /* iOS 4.1- */
 }
 
-.h5-video {
+[class *= "h5-video"] {
   font-family:"h5-video" !important;
   font-size:16px;
   font-style:normal;
