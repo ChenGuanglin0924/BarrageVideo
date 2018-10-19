@@ -10,13 +10,19 @@
 </head>
 <body>
     <div class="video-container">
-        <video width="1000" height="600" src="">您的浏览器不支持 video 标签。</video>
+        <video id="myVideo" src="http://pcdownaliyun.titan.mgtv.com/c1/2018/09/24_0/083D97A367D97139C57723FB1D23BA52_20180924_1_1_1622.mp4?arange=0&pm=G04PAo6W7Yj4CEZoW6gx~3nTmRbZHKXYh3JHXOU8OyAeCLEXgknwHtDEK521B6Mt~vhwhJWffqOsEK2o7V4LwPIZ_Ut16~H2XgXD_2sOZZkCxHiZrxVUwUsBo7B5JBDSoh3Im9tqMELqUgjWMMwsaUBcxZxB9s7~pvCLZWROB1Z9iwhOMAGmNXtdLyeRYbJfVY4JBghmW~b22ihIyReGRub6doi1W~KNj5pPIheWaC5T0z7eHf8OpTC0B8QM31GD90qLN_NCG_2shL2x4WIQ32gq9tCegN9kO1IyDPFfA7SAzcOUm6Z~xLC1Gc6bU5GRPr3RmBGZcSf9e6e0prGYKgSFzemhUyr2IeMBgmdAZjWQVDk1xHfuSGxSA_ZDxCCTXy~0sVVfulFQupMa5NRIVw--&vcdn=0&scid=25021">您的浏览器不支持 video 标签。</video>
+        <!-- <video id="myVideo" src="E:\迅雷下载\快把我哥带走.Go.Brother.2018.HD1080P.国语中字.mp4">您的浏览器不支持 video 标签。</video> -->
         <div class="video-control">
+            <!-- 进度条 -->
             <div class="process-container">
-                <div class="cache-bar"></div>
-                <div class="play-bar"></div>
+                <div class="process-bar">
+                    <div class="cache-bar"></div>
+                    <div class="play-bar"></div>
+                </div>
+                <div class="process-info"></div>
                 <div class="adjust-tool"></div>
             </div>
+            <!-- 工具栏 -->
             <div class="control-container">
                 <div class="control-left">
                     <!-- 播放/暂停 -->
@@ -24,7 +30,7 @@
                         <a class="play-tool h5-video-play"></a>
                     </div>
                     <!-- 时间控件 -->
-                    <div>
+                    <div class="time-container">
                         <span class="time time-current">00:00</span>
                         <span> / </span>
                         <span class="time time-total">00:00</span>
@@ -38,9 +44,12 @@
                     <!-- 音量控件 -->
                     <div class="volume-container">
                         <div class="volume-content">
-                            <div class="volume-value">60%</div>
-                            <div class="volume-slider-bg">
-                                <div class="volume-slider"></div>
+                            <div>
+                                <div class="volume-value">50%</div>
+                                <div class="volume-slider-bg">
+                                    <div class="volume-bg"></div>
+                                    <div class="volume-slider"></div>
+                                </div>
                             </div>
                         </div>
                         <a class="volume-tool h5-video-volume-on"></a>

@@ -4,17 +4,27 @@
     padding: 0;
 }
 
-.video-container {
-    position: relative;
-    width: 1000px;
-    height: 600px;
-    margin: 0 auto;
-    border: 1px solid gray;
-}
-
-/* 隐藏 */
 .hide {
     display: none;
+}
+
+.video-container {
+    position: relative;
+    width: 500px;
+    height: 300px;
+    margin: 0 auto;
+    background-color: black;
+}
+
+#myVideo {
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    object-fit: fill;
+}
+
+.video-container:hover .video-control{
+    /* display: block; */
 }
 
 /* 工具栏 */
@@ -22,54 +32,115 @@
     position: absolute;
     bottom: 0;
     width: 100%;
-    height: 50px;
-    background-color: black;
     user-select: none;
+    display: none;
+    -moz-box-shadow: inset 0px -10px 100px -10px #333;
+    -webkit-box-shadow: inset 0px -10px 100px -10px #333;
+    box-shadow: inset 0px -10px 100px -10px #333;
+    z-index: 101;
 }
 
 /* 工具栏 进度条 */
 .video-control .process-container {
-    position: absolute;
-    top: 0;
+    position: relative;
     width: 100%;
-    height: 5px;
+    height: 4px;
+    cursor: pointer;
+    z-index: 100;
+}
+
+.video-control .process-container:hover {
+    height: 8px;
+    transition: height .3s ease-out;
+}
+
+.video-control .process-container:hover .adjust-tool {
+    opacity: 1;
+    transition: opacity .3s ease; 
+}
+
+.video-control .process-container:hover .process-info {
+    display: block;
+}
+
+.process-container .process-bar {
+    position: absolute;
+    width: 100%;
+    height: 100%;
     background-color: lightgray;
 }
 
 .process-container .cache-bar {
     position: absolute;
-    width: 50%;
     height: 100%;
     background-color: gray;
-    opacity: 1;
 }
 
 .process-container .play-bar {
     position: absolute;
-    width: 30%;
     height: 100%;
     background-color: rgb(0, 190, 6);
-    opacity: 0.5;
 }
+
+.process-container .adjust-tool {
+    position: absolute;
+    top: -3px;
+    margin-left: -8px;
+    border-radius: 8px;
+    border: 5px solid #fff;
+    width: 4px;
+    height: 4px;
+    background-color: rgb(0, 190, 6);
+    opacity: 0;
+}
+
+.process-container .process-info {
+    position: absolute;
+    width: 50px;
+    height: 20px;
+    bottom: 10px;
+    padding: 2px 0;
+    border-radius: 4px;
+    font-size: 12px;
+    line-height: 20px;
+    text-align: center;
+    color: white;
+    display: none;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+/* .process-container .process-info::before {
+    position: absolute;
+    content: "";
+    width: 0;
+    height: 0;
+    top: 100%;
+    left: calc(50% - 6px);
+    border-top: 6px solid rgba(0, 0, 0, 0.8);
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+} */
 
 /* 工具栏  工具 */
 .control-container {
-    position: absolute;
+    position: relative;
     bottom: 0;
     width: 100%;
-    height: 100%;
-    line-height: 50px;
-    background-color: red;
-    opacity: 0.5;
+    height: 45px;
+    /* line-height: 45px; */
+    display: flex;
+    justify-content:space-between;
+    align-items:Center;
 }
 
 /* 工具按钮 */
-.control-container > div > div {
+.control-container > div > div > a {
+    font-size: 16px;
+    padding: 4px;
     color: white;
     cursor: pointer;
 }
 
-.control-container  > div > div:hover {
+.control-container  > div > div > a:hover {
     color: rgb(0, 190, 6);
 }
 
@@ -80,18 +151,35 @@
 
 .control-container .control-left > div {
     display: inline-block;
-    margin-left: 10px;
+    margin-left: 8px;
+}
+
+/*时间*/
+.time-container {
+    color: #fff;
+}
+
+.time-container span{
+    font-size: 14px;
+    color: #eeeeee
+}
+
+.time-container .time-current {
+    text-align: right;
+}
+
+.time-container .time-total {
+    text-align: left;
 }
 
 /* 右侧工具栏 */
 .control-container .control-right {
     float: right;
-    margin-right: 10px;
 }
 
 .control-container .control-right > div {
     display: inline-block;
-    margin-right: 10px;
+    margin-right: 8px;
 }
 
 /* 音量 */
@@ -103,17 +191,32 @@
     display: block;
 }
 
+.control-container .volume-container:hover .volume-content{
+    /* display: block; */
+    /* opacity: 1; */
+    /* transition: display 2s ease; */
+}
+
 .control-container .volume-content {
     position: absolute;
-    bottom: 50px;
+    bottom: 20px;
     margin: 0 auto;
     width: 40px;
     left: 50%;
     transform: translateX(-50%);
-    padding: 6px 0;
-    border-radius: 4px;
-    background-color: black;
+    padding-bottom: 20px;
+    z-index: 101;
+    /* border-radius: 4px; */
+    /* background-color: red; */
     display: none;
+    /* opacity: 0; */
+    cursor: pointer;
+}
+
+.control-container .volume-content > div {
+    padding-bottom: 6px;
+    background-color: black;
+    border-radius: 4px;
 }
 
 .volume-content .volume-value {
@@ -126,10 +229,20 @@
 .volume-content .volume-slider-bg {
     position: relative;
     width: 4px;
-    height: 108px;
+    height: 100px;
     margin: 2px auto;
     border-radius: 4px;
     background-color: red;
+}
+
+.volume-content .volume-bg {
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 4px;
+    background-color: yellow;
 }
 
 .volume-slider-bg .volume-slider {
@@ -138,8 +251,8 @@
     height: 8px;
     left: 50%;
     transform: translateX(-50%);
-    bottom: 50px;
+    /* bottom: 50px; */
     border-radius: 4px;
     background-color: green;
-    cursor: pointer;
+    
 }
