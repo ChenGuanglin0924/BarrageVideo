@@ -20,6 +20,8 @@ let myVideo = document.getElementById("myVideo");
     volumeBgDIV = document.getElementsByClassName("volume-bg")[0],
     volumeSliderDIV = document.getElementsByClassName("volume-slider")[0];
     volumeContentDIV = document.getElementsByClassName("volume-content")[0];
+    videoPoster = document.getElementsByClassName("video-poster")[0];
+    // posterClose = videoPoster.getElementsByClassName("close")[0];
     
     
 
@@ -30,7 +32,9 @@ let timeTotal = 0,
     isProcessMove = false,
     volume = 50,
     muted = false,
-    videoControlTimer = null;
+    videoControlTimer = null,
+    isChangeProcess = false
+    isChangeVolume = false;
 
 myVideo.addEventListener("loadeddata", initVideo);
 myVideo.addEventListener("timeupdate", setCurrentTime);
@@ -41,41 +45,85 @@ processContainerDIV.addEventListener("mousemove", showProcessInfo);
 volumeSliderBgDIV.addEventListener("mousedown", changeVideoVolume);
 volumeToolDIV.addEventListener("mousedown", changeVolumeMute);
 videoContainer.addEventListener("mouseenter", mouseOverVideo);
-videoControl.addEventListener("mouseenter", showVideoControl);
-
-
+videoContainer.addEventListener("mouseleave", mouseLeaveVideo);
+videoContainer.addEventListener("click", videoClicked);
+videoControl.addEventListener("mouseover", showVideoControl);
+videoPoster.addEventListener("click", go2PosterUrl);
+// posterClose.addEventListener("click", closePoster);
 
 /**
- * 显示底部工具栏
+ * 暂停海报点击事件
  */
-function mouseOverVideo() {
-    videoControl.style.display = "block";
-    videoContainer.addEventListener("mousemove", hideVideoControl);
+function go2PosterUrl(e) {
+    e = e || window.event;
+    if (e.target.className.indexOf("close") > -1) {
+        toggleClass(videoPoster, false);
+    }
+    else {
+        window.open("https://www.baidu.com");
+    }
 }
 
 /**
- * 隐藏底部工具栏
+ * 视频点击事件
+ * @param {Event} e 
  */
-function hideVideoControl(e) {
-    videoControl.style.display = "block";
-    clearInterval(videoControlTimer);
+function videoClicked(e) {
     if (e.target === myVideo) {
+        changePlayStatus();
+    }
+}
+
+/**
+ * 鼠标移动
+ */
+function mouseOverVideo() {
+    toggleClass(videoControl, true);
+    videoContainer.addEventListener("mousemove", mouseInVideo);
+}
+
+/**
+ * 鼠标移动或静止
+ */
+function mouseInVideo(e) {
+    toggleClass(videoControl, true);
+    clearInterval(videoControlTimer);
+    if (e.target === myVideo && !isChangeVolume && !isChangeProcess) {
         videoControlTimer = setTimeout(function () {
-            let a = e.target;
-            videoControl.style.display = "none";
+            toggleClass(videoControl, false);
         }, 5000);
     }
 }
 
+/**
+ * 鼠标移出video
+ */
 function mouseLeaveVideo() {
-    setTimeout(() => {
-        videoControl.style.display = "none";
-    }, 5000);
+    clearInterval(videoControlTimer);
+    if (!isChangeProcess && !isChangeVolume) {
+        videoControlTimer = setTimeout(function () {
+            toggleClass(videoControl, false);
+        }, 5000);
+    }
 }
 
+/**
+ * 鼠标在工具栏上
+ */
 function showVideoControl() {
-    videoControl.style.display = "block";
+    toggleClass(videoControl, true);
     clearInterval(videoControlTimer);
+    videoControl.addEventListener("mouseleave", hideVideoControl);
+}
+
+/**
+ * 鼠标移出工具栏，隐藏工具栏
+ */
+function hideVideoControl() {
+    clearInterval(videoControlTimer);
+    videoControlTimer = setTimeout(function () {
+        toggleClass(videoControl, false);
+    }, 5000);
 }
 
 
@@ -128,8 +176,8 @@ function changeVideoVolume(e) {
     if (e.button !== 0) {
         return;
     }
-    let volumeSliderBgHeight = volumeSliderBgDIV.offsetHeight,
-        delta = volumeSliderDIV.offsetHeight / 2;
+    let volumeSliderBgHeight = volumeSliderBgDIV.offsetHeight;
+    // let delta = volumeSliderDIV.offsetHeight / 2;
     if (e.target === volumeSliderBgDIV || e.target === volumeBgDIV) {
         let top = e.target === volumeSliderBgDIV ? e.offsetY : e.offsetY + e.target.offsetTop; 
         top = top < 0 ? 0 : top;
@@ -147,6 +195,9 @@ function changeVideoVolume(e) {
         }
         updateVolume(volume, muted);
     } else if(e.target === volumeSliderDIV) {
+        isChangeVolume = true;
+        addClass(volumeContentDIV, "show");
+        addClass(videoControl, "show");
         let top = e.clientY - volumeSliderDIV.offsetTop;
         document.onmousemove = VolumeBarDragging.bind(e, top);
         document.onmouseup = VolumeBarUp;
@@ -186,10 +237,11 @@ function VolumeBarDragging(top, e) {
  * 停止音量拖动
  */
 function VolumeBarUp(e) {
+    isChangeVolume = false;
+    // removeClass(videoControl, "show");
+    removeClass(volumeContentDIV, "show");
     document.onmousemove = null;
     document.onmouseup = null;
-    // document.removeEventListener("mousemove", VolumeBarDragging);
-    // document.removeEventListener("mouseup", VolumeBarUp);
 }
 
 /**
@@ -205,6 +257,9 @@ function processMousedown(e) {
     myVideo.currentTime = percentLeft * timeTotal;
     adjustToolDIV.style.left = percentLeft * 100 + "%";
 
+    //拖动时一直显示进度条
+    isChangeProcess = true;
+    addClass(processContainerDIV, "process-active");
     document.onmousemove = processMousemove;
     document.onmouseup = processMouseup;
     // document.addEventListener("mousemove", processMousemove);
@@ -217,19 +272,29 @@ function processMousedown(e) {
  */
 function processMousemove(e) {
     e = e || window.event;
-    let processBarWidth = processBarDIV.offsetWidth;
+    let processBarWidth = processBarDIV.offsetWidth,
+        delta = processInfoDIV.clientWidth / 2;
     let left = e.clientX - videoContainer.offsetLeft;
     if (left <= 0) {
         left = 0;
-    };
+    }
     if (left >= processBarWidth) {
         left = processBarWidth;
-    };
+    }
+    let infoLeft = left - delta;
+    infoLeft = infoLeft < 0 ? 0 : infoLeft;
+    infoLeft = infoLeft > left + delta ? left + delta : infoLeft;
+    // if (condition) {
+        
+    // }
     
     let percentLeft = left / processBarWidth;
     adjustToolDIV.style.left = percentLeft * 100 + "%";
     myVideo.currentTime = percentLeft * timeTotal;
-    
+
+    processInfoDIV.style.left = infoLeft / processBarWidth * 100 + "%";
+    processInfoDIV.innerText = formatTime(percentLeft * timeTotal);
+    processContainerDIV.removeEventListener("mousemove", showProcessInfo);
 }
 
 /**
@@ -237,10 +302,11 @@ function processMousemove(e) {
  * @param {Event} e 
  */
 function processMouseup() {
+    isChangeProcss = false;
+    removeClass(processContainerDIV, "process-active");
     document.onmousemove = null;
     document.onmouseup = null;
-    // document.removeEventListener("mousemove", processMousemove);
-    // document.removeEventListener("mouseup", processMouseup);
+    processContainerDIV.addEventListener("mousemove", showProcessInfo);
 }
 
 /**
@@ -399,11 +465,43 @@ function changePlayStatus() {
         myVideo.play();
         removeClass(playToolDIV, "h5-video-play");
         addClass(playToolDIV, "h5-video-pause");
+        toggleClass(videoPoster, false);
     } else {
         myVideo.pause();
         removeClass(playToolDIV, "h5-video-pause");
         addClass(playToolDIV, "h5-video-play");
+        toggleClass(videoPoster, true);
     }
+}
+
+/**
+ * 切换show和hide样式
+ * @param {Element} element element
+ * @param {Boolean} flag 是否显示
+ */
+function toggleClass(element, flag) {
+    if (!element) {
+        return;
+    }
+    let elmClass = element.getAttribute("class") || "";
+    if (flag) {
+        if (elmClass.indexOf("hide") > -1) {
+            elmClass = elmClass.replace("hide", "");
+            elmClass = elmClass.trim();
+        }
+        if (elmClass.indexOf("show") < 0) {
+            elmClass += ` show`;
+        }
+    }
+    else {
+        if (elmClass.indexOf("show") > -1) {
+            elmClass = elmClass.replace("show", "").trim();
+        }
+        if (elmClass.indexOf("hide") < 0) {
+            elmClass += ` hide`;
+        }
+    }
+    element.setAttribute("class", elmClass);
 }
 
 /**
@@ -415,11 +513,12 @@ function addClass(element, className) {
     if (!element) {
         return;
     }
-    let elmClass = element.getAttribute("class");
+    let elmClass = element.getAttribute("class") || "";
+    elmClass = elmClass.trim();
     if (className && elmClass.indexOf(className) < 0) {
         elmClass += ` ${className}`;
     }
-    element.setAttribute("class", elmClass.trim());
+    element.setAttribute("class", elmClass);
 }
 
 /**
@@ -431,9 +530,9 @@ function removeClass(element, className) {
     if (!element) {
         return;
     }
-    let elmClass = element.getAttribute("class").trim();
+    let elmClass = element.getAttribute("class") || "";
     if (className && elmClass.indexOf(className) > -1) {
-        elmClass = elmClass.replace(className, "");
+        elmClass = elmClass.replace(className, "").trim();
     }
-    element.setAttribute("class", elmClass.trim());
+    element.setAttribute("class", elmClass);
 }
