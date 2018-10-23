@@ -21,23 +21,64 @@
 }
 
 #myVideo {
+    position: absolute;
     width: 100%;
     height: 100%;
     z-index: 100;
-    object-fit: fill;
+    /* object-fit: fill; */
+    z-index: 100;
+}
+
+/* 弹幕 */
+.video-barrage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: calc(100% - 60px);
+    z-index: 110;
+}
+
+#barrageCanvas {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* 加载动画 */
+.video-waitting {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 10px;
+    border: 1px solid #ffffff85;
+    border-radius: 10px;
+    font-size: 12px;
+    background-color: #000000cf;
+    color: white;
+    z-index: 120;
+}
+
+.video-waitting .loading{
+    
 }
 
 /* 暂停时显示海报 */
 .video-poster {
     position: absolute;
-    top: 50%;
+    top: 45%;
     left: 50%;
     width: 40%;
     height: 40%;
-    transform: translateX(-50%) translateY(-50%);
+    transform: translate(-50%, -50%);
     background-color: white;
     border-radius: 10px;
     cursor: pointer;
+    z-index: 110;
 }
 
 .video-poster .close {
@@ -50,6 +91,7 @@
     border-radius: 40px;
     font-size: 12px;
     opacity: .9;
+    color: gray;
 }
 
 .video-poster .close:hover {
@@ -71,7 +113,7 @@
     -moz-box-shadow: inset 0px -10px 100px -10px #333;
     -webkit-box-shadow: inset 0px -10px 100px -10px #333;
     box-shadow: inset 0px -10px 100px -10px #333;
-    z-index: 101;
+    z-index: 110;
 }
 
 /* 工具栏 进度条 */

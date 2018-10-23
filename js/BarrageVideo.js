@@ -1,4 +1,6 @@
-let myVideo = document.getElementById("myVideo");
+let myVideo = document.getElementById("myVideo"),
+    barrageCanvas = document.getElementById('barrageCanvas'),
+    // videoBarrage = document.getElementsByClassName("video-barrage")[0],
     videoContainer = document.getElementsByClassName("video-container")[0],
     videoControl = document.getElementsByClassName("video-control")[0],
     playToolDIV = document.getElementsByClassName("play-tool")[0],
@@ -21,6 +23,7 @@ let myVideo = document.getElementById("myVideo");
     volumeSliderDIV = document.getElementsByClassName("volume-slider")[0];
     volumeContentDIV = document.getElementsByClassName("volume-content")[0];
     videoPoster = document.getElementsByClassName("video-poster")[0];
+    videoWaitting = document.getElementsByClassName("video-waitting")[0];
     // posterClose = videoPoster.getElementsByClassName("close")[0];
     
     
@@ -36,8 +39,9 @@ let timeTotal = 0,
     isChangeProcess = false
     isChangeVolume = false;
 
-myVideo.addEventListener("loadeddata", initVideo);
+myVideo.addEventListener("loadeddata", initVideo); 
 myVideo.addEventListener("timeupdate", setCurrentTime);
+myVideo.addEventListener("waiting", videoWaitting);
 playToolDIV.addEventListener("click", changePlayStatus);
 fullscreenToolDIV.addEventListener("click", changeScreenStatus);
 processContainerDIV.addEventListener("mousedown", processMousedown);
@@ -50,6 +54,20 @@ videoContainer.addEventListener("click", videoClicked);
 videoControl.addEventListener("mouseover", showVideoControl);
 videoPoster.addEventListener("click", go2PosterUrl);
 // posterClose.addEventListener("click", closePoster);
+
+/**
+ * 缓冲中...
+ */
+myVideo.onwaiting = () => {
+    toggleClass(videoWaitting, true);
+}
+
+/**
+ * 缓冲完成
+ */
+myVideo.oncanplay = () => {
+    toggleClass(videoWaitting, false);
+}
 
 /**
  * 暂停海报点击事件
@@ -69,7 +87,7 @@ function go2PosterUrl(e) {
  * @param {Event} e 
  */
 function videoClicked(e) {
-    if (e.target === myVideo) {
+    if (e.target === barrageCanvas) {
         changePlayStatus();
     }
 }
@@ -91,7 +109,7 @@ function mouseInVideo(e) {
     if (e.target === myVideo && !isChangeVolume && !isChangeProcess) {
         videoControlTimer = setTimeout(function () {
             toggleClass(videoControl, false);
-        }, 5000);
+        }, 3000);
     }
 }
 
@@ -103,7 +121,7 @@ function mouseLeaveVideo() {
     if (!isChangeProcess && !isChangeVolume) {
         videoControlTimer = setTimeout(function () {
             toggleClass(videoControl, false);
-        }, 5000);
+        }, 3000);
     }
 }
 
@@ -123,7 +141,7 @@ function hideVideoControl() {
     clearInterval(videoControlTimer);
     videoControlTimer = setTimeout(function () {
         toggleClass(videoControl, false);
-    }, 5000);
+    }, 3000);
 }
 
 
@@ -355,8 +373,15 @@ function setCacheTime() {
         timeCache = myVideo.buffered.end(0);
     }
     cacheBar.style.width = 100 * (timeCache / timeTotal) + "%";
+    //是否加载中...
+    // if (timeCache < timeCurrent) {
+    //     toggleClass(videoWaitting, true);
+    // }
+    // else {
+    //     toggleClass(videoWaitting, false);
+    // }
     // 在视频播放期间每500毫秒进行一次递归，重新获取缓存值;
-    if (timeCache < timeTotal) {
+    if (timeCache <= timeTotal) {
         setInterval(setCacheTime, 500);
     }
 }
@@ -471,6 +496,7 @@ function changePlayStatus() {
         removeClass(playToolDIV, "h5-video-pause");
         addClass(playToolDIV, "h5-video-play");
         toggleClass(videoPoster, true);
+        toggleClass(videoWaitting, false);
     }
 }
 

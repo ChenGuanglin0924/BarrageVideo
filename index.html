@@ -5,15 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>BarrageVideo</title>
-    <link rel="stylesheet" href="./iconfont/iconfont.css">
-    <link rel="stylesheet" href="./BarrageVideo.css">
+    <link rel="stylesheet" href="./resources/iconfont/iconfont.css">
+    <link rel="stylesheet" href="./css/BarrageVideo.css">
 </head>
 <body>
     <div class="video-container">
         <video id="myVideo" src="http://pcdownaliyun.titan.mgtv.com/c1/2018/09/24_0/083D97A367D97139C57723FB1D23BA52_20180924_1_1_1622.mp4?arange=0&pm=G04PAo6W7Yj4CEZoW6gx~3nTmRbZHKXYh3JHXOU8OyAeCLEXgknwHtDEK521B6Mt~vhwhJWffqOsEK2o7V4LwPIZ_Ut16~H2XgXD_2sOZZkCxHiZrxVUwUsBo7B5JBDSoh3Im9tqMELqUgjWMMwsaUBcxZxB9s7~pvCLZWROB1Z9iwhOMAGmNXtdLyeRYbJfVY4JBghmW~b22ihIyReGRub6doi1W~KNj5pPIheWaC5T0z7eHf8OpTC0B8QM31GD90qLN_NCG_2shL2x4WIQ32gq9tCegN9kO1IyDPFfA7SAzcOUm6Z~xLC1Gc6bU5GRPr3RmBGZcSf9e6e0prGYKgSFzemhUyr2IeMBgmdAZjWQVDk1xHfuSGxSA_ZDxCCTXy~0sVVfulFQupMa5NRIVw--&vcdn=0&scid=25021">您的浏览器不支持 video 标签。</video>
+        <div class="video-barrage">
+            <canvas id="barrageCanvas"></canvas>
+        </div>
         <div class="video-poster">
-            <a class="close h5-video-play"></a>
+            <a class="close h5-video-close"></a>
             <img class="img" src="./resources/images/none.png" alt="">
+        </div>
+        <div class="video-waitting hide">
+            <div class="loading">加载中...</div>
         </div>
         <div class="video-control">
             <!-- 进度条 -->
@@ -71,5 +77,7 @@
         </div>
     </div>
 </body>
-<script src="./BarrageVideo.js" async></script>
+<script src="./js/BarrageVideo.js" async></script>
+<script src="./js/Barrage.js" async></script>
+<script src="./js/BarrageUtil.js" async></script>
 </html>
