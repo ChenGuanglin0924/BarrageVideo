@@ -4,6 +4,7 @@ let myVideo = document.getElementById("myVideo"),
     videoContainer = document.getElementsByClassName("video-container")[0],
     videoControl = document.getElementsByClassName("video-control")[0],
     playToolDIV = document.getElementsByClassName("play-tool")[0],
+    reloadToolDIV = document.getElementsByClassName("reload-tool")[0],
     timeCurrentDIV = document.getElementsByClassName("time-current")[0],
     timeTotalDIV = document.getElementsByClassName("time-total")[0],
     barrageToolDIV = document.getElementsByClassName("barrage-tool")[0],
@@ -25,7 +26,10 @@ let myVideo = document.getElementById("myVideo"),
     videoPoster = document.getElementsByClassName("video-poster")[0];
     videoWaitting = document.getElementsByClassName("video-waitting")[0];
     // posterClose = videoPoster.getElementsByClassName("close")[0];
-    
+    sendBarrageValue = document.getElementsByClassName("send-barrage-value")[0];
+    sendBarrageBtn = document.getElementsByClassName("send-barrage-btn")[0];
+    rateContent = document.getElementsByClassName("rate-content")[0];
+    barrageTool = document.getElementsByClassName("barrage-tool")[0];
     
 
 let timeTotal = 0, 
@@ -37,7 +41,10 @@ let timeTotal = 0,
     muted = false,
     videoControlTimer = null,
     isChangeProcess = false
-    isChangeVolume = false;
+    isChangeVolume = false,
+    barrageUtil = null,
+    isFullScreen = false,
+    playbackRate = 1;
 
 myVideo.addEventListener("loadeddata", initVideo); 
 myVideo.addEventListener("timeupdate", setCurrentTime);
@@ -53,7 +60,92 @@ videoContainer.addEventListener("mouseleave", mouseLeaveVideo);
 videoContainer.addEventListener("click", videoClicked);
 videoControl.addEventListener("mouseover", showVideoControl);
 videoPoster.addEventListener("click", go2PosterUrl);
-// posterClose.addEventListener("click", closePoster);
+sendBarrageBtn.addEventListener("click", sendBarrage);
+reloadToolDIV.addEventListener("click", reloadVideo);
+rateContent.addEventListener('click', changePlayRate);
+barrageTool.addEventListener('click', switchVideoBarrage);
+//全屏事件监听
+document.addEventListener('fullscreenchange', changeFullScreenStatus);
+document.addEventListener('webkitfullscreenchange', changeFullScreenStatus);
+document.addEventListener('mozfullscreenchange', changeFullScreenStatus);
+document.addEventListener('MSFullscreenChange', changeFullScreenStatus);
+
+/**
+ * 切换弹幕开关
+ */
+function switchVideoBarrage(e) {
+    e.stopPropagation();
+    if (e.currentTarget.className.indexOf("on") > -1) {
+        removeClass(e.currentTarget, "on");
+    } else {
+        addClass(e.currentTarget, "on");
+    }
+}
+
+/**
+ * 全屏和非全屏状态改变事件
+ */
+function changeFullScreenStatus() {
+    let fullscreenElement = document.fullscreenElement 
+        || document.mozFullScreenElement 
+        || document.webkitFullscreenElement;
+    if (fullscreenElement) {
+        removeClass(fullscreenToolDIV, "h5-video-fullscreen");
+        addClass(fullscreenToolDIV, "h5-video-mini-screen");
+        isFullScreen = true;
+    } else {
+        removeClass(fullscreenToolDIV, "h5-video-mini-screen");
+        addClass(fullscreenToolDIV, "h5-video-fullscreen");
+        isFullScreen = false;
+    }
+}
+
+/**
+ * 改变播放速率
+ */
+function changePlayRate(e) {
+    e.stopPropagation();
+    if (e.target.tagName === "LI") {
+        playbackRate =  parseFloat(e.target.innerText.split(" ")[1]);
+        myVideo.playbackRate = playbackRate;
+        let elm = e.target.parentNode.getElementsByClassName("active");
+        if (elm) {
+            removeClass(e.target.parentNode.getElementsByClassName("active")[0], "active");
+        }
+        addClass(e.target, "active");
+    }
+}
+
+/**
+ * 视频重加载
+ */
+function reloadVideo(e) {
+    e.stopPropagation();
+    pauseVideo();
+    myVideo.load();
+    if (barrageUtil) {
+        barrageUtil.initBarrage();
+        barrageUtil = null;
+    }
+}
+
+/**
+ *发送弹幕
+ */
+function sendBarrage() {
+    let val = sendBarrageValue.value;
+    if (!val || val.trim() === "") {
+        return;
+    }
+    barrageUtil.addBarrage({
+        date: "2018-11-02",
+        time: timeCurrent,
+        text: val,
+        size: "16",
+        color: "yellow",
+        speed: Math.random() * 10
+    });
+}
 
 /**
  * 缓冲中...
@@ -105,8 +197,10 @@ function mouseOverVideo() {
  */
 function mouseInVideo(e) {
     toggleClass(videoControl, true);
-    clearInterval(videoControlTimer);
-    if (e.target === myVideo && !isChangeVolume && !isChangeProcess) {
+    if (videoControlTimer) {
+        clearTimeout(videoControlTimer);
+    }
+    if (e.target === barrageCanvas && !isChangeVolume && !isChangeProcess) {
         videoControlTimer = setTimeout(function () {
             toggleClass(videoControl, false);
         }, 3000);
@@ -117,7 +211,9 @@ function mouseInVideo(e) {
  * 鼠标移出video
  */
 function mouseLeaveVideo() {
-    clearInterval(videoControlTimer);
+    if (videoControlTimer) {
+        clearTimeout(videoControlTimer);
+    }
     if (!isChangeProcess && !isChangeVolume) {
         videoControlTimer = setTimeout(function () {
             toggleClass(videoControl, false);
@@ -130,7 +226,9 @@ function mouseLeaveVideo() {
  */
 function showVideoControl() {
     toggleClass(videoControl, true);
-    clearInterval(videoControlTimer);
+    if (videoControlTimer) {
+        clearTimeout(videoControlTimer);
+    }
     videoControl.addEventListener("mouseleave", hideVideoControl);
 }
 
@@ -138,7 +236,9 @@ function showVideoControl() {
  * 鼠标移出工具栏，隐藏工具栏
  */
 function hideVideoControl() {
-    clearInterval(videoControlTimer);
+    if (videoControlTimer) {
+        clearTimeout(videoControlTimer);
+    }
     videoControlTimer = setTimeout(function () {
         toggleClass(videoControl, false);
     }, 3000);
@@ -302,9 +402,6 @@ function processMousemove(e) {
     let infoLeft = left - delta;
     infoLeft = infoLeft < 0 ? 0 : infoLeft;
     infoLeft = infoLeft > left + delta ? left + delta : infoLeft;
-    // if (condition) {
-        
-    // }
     
     let percentLeft = left / processBarWidth;
     adjustToolDIV.style.left = percentLeft * 100 + "%";
@@ -368,24 +465,24 @@ function getProcessLeft(e) {
 /**
  * 设置视频缓存进度条长度
  */
-function setCacheTime() {
-    if (myVideo.buffered.length > 0) {
-        timeCache = myVideo.buffered.end(0);
-    }
-    cacheBar.style.width = 100 * (timeCache / timeTotal) + "%";
-    //是否加载中...
-    // if (timeCache < timeCurrent) {
-    //     toggleClass(videoWaitting, true);
-    // }
-    // else {
-    //     toggleClass(videoWaitting, false);
-    // }
-    // 在视频播放期间每500毫秒进行一次递归，重新获取缓存值;
-    if (timeCache <= timeTotal) {
-        setInterval(setCacheTime, 500);
-    }
-}
-setCacheTime();
+// function setCacheTime() {
+//     if (myVideo.buffered.length > 0) {
+//         timeCache = myVideo.buffered.end(0);
+//     }
+//     cacheBar.style.width = 100 * (timeCache / timeTotal) + "%";
+//     //是否加载中...
+//     // if (timeCache < timeCurrent) {
+//     //     toggleClass(videoWaitting, true);
+//     // }
+//     // else {
+//     //     toggleClass(videoWaitting, false);
+//     // }
+//     // 在视频播放期间每500毫秒进行一次递归，重新获取缓存值;
+//     if (timeCache <= timeTotal) {
+//         setInterval(setCacheTime, 500);
+//     }
+// }
+// setCacheTime();
 
 /**
  * 获取视频播放进度条长度
@@ -397,36 +494,80 @@ function updateCurrentProcess() {
 }
 
 /**
- * 全屏
- *
- * @param {Element} element  需要全屏的元素
+ * 更新弹幕幕布尺寸
+ * @param {Boolean} isFullScreen  是否全屏
  */
-function fullScreen(element) {
-    if (element.requestFullscreen) {
-        element.requestFullscreen();
-    } else if (element.mozRequestFullScreen) {
-        element.mozRequestFullScreen();
-    } else if (element.webkitRequestFullscreen) {
-        element.webkitRequestFullscreen();
-    } else if (element.msRequestFullscreen) {
-        element.msRequestFullscreen();
+function resetCanvasSize(isFullScreen) {
+    if (isFullScreen !== undefined && isFullScreen !== null) {
+        isFullScreen = !isFullScreen;
+    }
+    // barrageCanvas.width = myVideo.clientWidth;
+    // barrageCanvas.height = myVideo.clientHeight - 60;
+    if (barrageUtil) {
+        barrageUtil.resetBarrage();
+    } else {
+        barrageUtil = new BarrageUtil(myVideo, barrageCanvas, {datas: barrages});
+        barrageUtil.render();
     }
 }
 
 /**
- * 退出全屏
+ * 全屏
+ * @param {Element} element  需要全屏的元素
  */
-function exitFullscreen() {
-    if (document.exitFullscreen) {
-        document.exitFullscreen();
-    } else if (document.mozCancelFullScreen) {
-        document.mozCancelFullScreen();
-    } else if (document.webkitExitFullscreen) {
-        document.webkitExitFullscreen();
-    } else if (document.msExitFullscreen) {
-        document.msExitFullscreen();
+function fullScreen(element) {
+    var el = element instanceof HTMLElement ? element : document.documentElement;
+    var rfs = el.requestFullscreen       || 
+              el.webkitRequestFullscreen || 
+              el.mozRequestFullScreen    || 
+              el.msRequestFullscreen;
+    if (rfs) {
+        rfs.call(el);
+    } else if (window.ActiveXObject) {
+        var ws = new ActiveXObject("WScript.Shell");
+        ws && ws.SendKeys("{F11}");
     }
 }
+// function fullScreen(element) {
+//     if (element.requestFullscreen) {
+//         element.requestFullscreen();
+//     } else if (element.mozRequestFullScreen) {
+//         element.mozRequestFullScreen();
+//     } else if (element.webkitRequestFullscreen) {
+//         element.webkitRequestFullscreen();
+//     } else if (element.msRequestFullscreen) {
+//         element.msRequestFullscreen();
+//     }
+//     resetCanvasSize(true);
+// }
+
+/**
+ * 退出全屏
+ */
+function exitFullscreen(){
+    var efs = document.exitFullscreen       || 
+              document.webkitExitFullscreen || 
+              document.mozCancelFullScreen  || 
+              document.msExitFullscreen;
+    if (efs) {
+        efs.call(document);
+    } else if (window.ActiveXObject) {
+        var ws = new ActiveXObject("WScript.Shell");
+        ws && ws.SendKeys("{F11}");
+    }
+}
+// function exitFullscreen() {
+//     if (document.exitFullscreen) {
+//         document.exitFullscreen();
+//     } else if (document.mozCancelFullScreen) {
+//         document.mozCancelFullScreen();
+//     } else if (document.webkitExitFullscreen) {
+//         document.webkitExitFullscreen();
+//     } else if (document.msExitFullscreen) {
+//         document.msExitFullscreen();
+//     }
+//     resetCanvasSize(false);
+// }
 
 /**
  * 全屏或非全屏
@@ -435,18 +576,18 @@ function exitFullscreen() {
 function changeScreenStatus() {
     if (isFullScreen) {
         exitFullscreen();
-        removeClass(fullscreenToolDIV, "h5-video-mini-screen");
-        addClass(fullscreenToolDIV, "h5-video-fullscreen");
-        isFullScreen = false;
+        // removeClass(fullscreenToolDIV, "h5-video-mini-screen");
+        // addClass(fullscreenToolDIV, "h5-video-fullscreen");
+        // isFullScreen = false;
     } else {
         fullScreen(videoContainer);
-        removeClass(fullscreenToolDIV, "h5-video-fullscreen");
-        addClass(fullscreenToolDIV, "h5-video-mini-screen");
-        isFullScreen = true;
+        // removeClass(fullscreenToolDIV, "h5-video-fullscreen");
+        // addClass(fullscreenToolDIV, "h5-video-mini-screen");
+        // isFullScreen = true;
     }
 }
 
-/**
+/**v 
  * 将ms转换成min:seconds格式
  */
 function formatTime(ms) {
@@ -487,16 +628,39 @@ function initVideo() {
  */
 function changePlayStatus() {
     if (myVideo.paused || myVideo.ended) {
-        myVideo.play();
-        removeClass(playToolDIV, "h5-video-play");
-        addClass(playToolDIV, "h5-video-pause");
-        toggleClass(videoPoster, false);
+        playVideo();
     } else {
-        myVideo.pause();
-        removeClass(playToolDIV, "h5-video-pause");
-        addClass(playToolDIV, "h5-video-play");
-        toggleClass(videoPoster, true);
-        toggleClass(videoWaitting, false);
+        pauseVideo();
+    }
+}
+
+/**
+ * 播放视频
+ */
+function playVideo() {
+    myVideo.play();
+    removeClass(playToolDIV, "h5-video-play");
+    addClass(playToolDIV, "h5-video-pause");
+    toggleClass(videoPoster, false);
+    if (!barrageUtil) {
+        barrageUtil = new BarrageUtil(myVideo, barrageCanvas, {datas: barrages});
+        barrageUtil.render();
+    } else {
+        barrageUtil.runBarrage();
+    }
+}
+
+/**
+ * 暂停视频
+ */
+function pauseVideo() {
+    myVideo.pause();
+    removeClass(playToolDIV, "h5-video-pause");
+    addClass(playToolDIV, "h5-video-play");
+    toggleClass(videoPoster, true);
+    toggleClass(videoWaitting, false);
+    if (barrageUtil) {
+        barrageUtil.stopBarrage();
     }
 }
 

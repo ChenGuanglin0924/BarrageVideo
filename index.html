@@ -38,6 +38,10 @@
                     <div>
                         <a class="play-tool h5-video-play"></a>
                     </div>
+                    <!-- 重新加载 -->
+                    <div>
+                        <a class="reload-tool h5-video-refresh"></a>
+                    </div>
                     <!-- 时间控件 -->
                     <div class="time-container">
                         <span class="time time-current">00:00</span>
@@ -45,10 +49,29 @@
                         <span class="time time-total">00:00</span>
                     </div>
                 </div>
+                <div class="control-center">
+                    <!-- 发送弹幕 -->
+                    <div class="send-barrage-tool">
+                        <input type="text" class="send-barrage-value"/>
+                        <a class="send-barrage-btn">发送</a>
+                    </div>
+                </div>
                 <div class="control-right">
                     <!-- 弹幕开关 -->
-                    <div>
-                        <a class="barrage-tool"></a>
+                    <div class="barrage-tool">
+                        <div class="handle"></div>
+                    </div>
+                    <!-- 倍数播放 -->
+                    <div class="rate-container">
+                        <div class="rate-content">
+                            <ul>
+                                <li>X .50</li>
+                                <li class="active">X 1.0</li>
+                                <li>X 1.5</li>
+                                <li>X 2.0</li>
+                            </ul>
+                        </div>
+                        <a class="rate-tool">倍数</a>
                     </div>
                     <!-- 音量控件 -->
                     <div class="volume-container">
@@ -77,7 +100,8 @@
         </div>
     </div>
 </body>
+<script src="./resources/datas/barrages.js" async></script>
 <script src="./js/BarrageVideo.js" async></script>
-<script src="./js/Barrage.js" async></script>
+<!-- <script src="./js/Barrage.js" async></script> -->
 <script src="./js/BarrageUtil.js" async></script>
 </html>

@@ -14,8 +14,8 @@
 
 .video-container {
     position: relative;
-    width: 500px;
-    height: 300px;
+    width: 600px;
+    height: 400px;
     margin: 0 auto;
     background-color: black;
 }
@@ -35,7 +35,7 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: calc(100% - 60px);
+    height: 100%;
     z-index: 110;
 }
 
@@ -70,13 +70,13 @@
 /* 暂停时显示海报 */
 .video-poster {
     position: absolute;
-    top: 45%;
+    top: 50%;
     left: 50%;
-    width: 40%;
-    height: 40%;
+    width: 400px;
+    height: 300px;
     transform: translate(-50%, -50%);
     background-color: white;
-    border-radius: 10px;
+    border-radius: 4px;
     cursor: pointer;
     z-index: 110;
 }
@@ -109,10 +109,11 @@
     bottom: 0;
     width: 100%;
     user-select: none;
-    display: none;
-    -moz-box-shadow: inset 0px -10px 100px -10px #333;
+    /* display: none; */
+    background-color: #00000066;
+    /* -moz-box-shadow: inset 0px -10px 100px -10px #333;
     -webkit-box-shadow: inset 0px -10px 100px -10px #333;
-    box-shadow: inset 0px -10px 100px -10px #333;
+    box-shadow: inset 0px -10px 100px -10px #333; */
     z-index: 110;
 }
 
@@ -249,7 +250,7 @@
 }
 
 .time-container span{
-    font-size: 14px;
+    font-size: 13px;
     color: #eeeeee
 }
 
@@ -295,17 +296,14 @@
     transform: translateX(-50%);
     padding-bottom: 20px;
     z-index: 101;
-    /* border-radius: 4px; */
-    /* background-color: red; */
     display: none;
-    /* opacity: 0; */
-    cursor: pointer;
 }
 
 .control-container .volume-content > div {
     padding-bottom: 6px;
     background-color: black;
     border-radius: 4px;
+    cursor: pointer;
 }
 
 .volume-content .volume-value {
@@ -345,3 +343,136 @@
     background-color: green;
     
 }
+
+/* 倍数播放 */
+.control-container .rate-container {
+    position: relative;
+}
+
+.control-container .rate-container:hover .rate-content{
+    display: block;
+}
+
+.rate-container .rate-tool {
+    font-size: 14px;
+}
+
+.rate-container .rate-content {
+    position: absolute;
+    bottom: 20px;
+    margin: 0 auto;
+    width: 40px;
+    padding-bottom: 20px;
+    z-index: 101;
+    display: none;
+}
+
+.control-container .rate-content > ul {
+    background-color: black;
+    border-radius: 4px;
+    font-size: 12px;
+    text-align: center;
+    padding: 4px 0;
+    cursor: pointer;
+}
+
+.rate-container .rate-content li {
+    list-style: none;
+    color: white;
+    padding: 3px;
+}
+
+.rate-container .rate-content li:hover {
+    background-color: #ffffff2e;
+}
+
+.rate-container .rate-content .active {
+    background-color: #ffffff4a;
+}
+
+/* 弹幕开关 */  
+.barrage-tool {
+    position: relative;
+    top: 5px;
+    border-radius: 25px;
+    box-shadow: 0 1px 1px 0 rgba(255, 255, 255, 0.5), inset 0 1px 1px 0 rgba(0, 0, 0, 0.2);
+    width: 50px;
+    height: 25px;
+    overflow: hidden;
+    transition: all .25s linear;
+    cursor: pointer;
+    background-color: #fff;
+}
+.barrage-tool .handle {
+    width: 20px;
+    height: 20px;
+    border-radius: 20px;
+    position: absolute;
+    top: 3px;
+    background: #FFF;
+    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.2), 0px 4px 23px 0 rgba(0, 0, 0, 0.2), -2px 4px 4px 0 rgba(0, 0, 0, 0.2);
+    text-decoration: none;
+    font-size: 12px;
+    line-height: 25px;
+    text-align: center;
+    left: 2px;
+    transition: all 0.4s cubic-bezier(0.33, 1.6, 0.66, 1);
+}
+.barrage-tool .handle:before {
+    -webkit-font-smoothing: antialiased;
+}
+.barrage-tool .handle:after {
+    content: "ON";
+    font-size: 12px;
+    font-weight: 400;
+    color: #FFF;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+    position: absolute;
+    left: -24px;
+    line-height: 20px;
+}
+.barrage-tool.on {
+    background: green;
+}
+.barrage-tool.on .handle {
+    left: 28px;
+    color: green;
+}
+  
+
+/* 中间工具栏 */
+.control-container .control-center {
+    flex: 1;
+    /* margin: 0 20px; */
+    box-sizing: border-box;
+}
+
+.control-center .send-barrage-tool {
+    background-color: white;
+    display: flex;
+    justify-content: space-between;
+    border-radius: 4px;
+}
+
+.control-center .send-barrage-tool .send-barrage-value {
+    margin-left: 5px;
+    padding: 5px;
+    border: none;
+    outline: none;
+    flex: 1;
+}
+
+.control-center .send-barrage-tool .send-barrage-btn {
+    color: black;
+    font-size: 12px;
+    border-left: 1px solid gray;
+    display: inline-block;
+    width: 50px;
+    text-align: center;
+    background-color:#3333330f;
+}
+
+.control-center .send-barrage-tool .send-barrage-btn:hover {
+    color: green;
+}
+
