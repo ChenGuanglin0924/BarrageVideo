@@ -3,12 +3,12 @@ let Barrage = function(canvas, context, options) {
     this.context = context;
     this.canvas = canvas;
     // this.options = options || {};
+    this.random = Math.random();
     this.x = this.canvas.clientWidth;
-    //这里减去（播放工具栏）大概60的高度
-    this.y = Math.floor(Math.random() * (this.canvas.clientHeight - 60));
+    this.y = this.canvas.clientHeight * this.random;
     this.text = options.text || "";
     this.width = context.measureText(this.text).width;
-    this.fontSize = options.fontSize || 12;
+    this.fontSize = options.fontSize || 16;
     this.color = options.color || "#fff";
     this.speed = options.speed || 4;
     this.date = options.date || "";
@@ -18,10 +18,17 @@ let Barrage = function(canvas, context, options) {
     // this.userInfo = {
     //     userName: ""
     // }
-    this.draw = () => {
+    this.draw = (options) => {
         // this.context.save();
+        if (options && typeof options.opacity === 'number') {
+            this.context.globalAlpha  = options.opacity;
+        }
+        if (options && options.range instanceof Array) {
+            this.y = 
+            this.canvas.clientHeight * options.range[0] + Math.floor((options.range[1] - options.range[0]) * this.canvas.clientHeight * this.random);
+        }
         this.context.textBaseline = "top";
-        this.context.font = this.fontSize + "px";
+        this.context.font = this.fontSize + "px sans-serif";
         this.context.fillStyle = this.color;
         this.context.fillText(this.text, this.x, this.y);
         // this.context.restore();
@@ -43,11 +50,13 @@ let Barrage = function(canvas, context, options) {
 let BarrageUtil = function(myVideo, canvas, options) {
     this.myVideo = myVideo;
     this.canvas = canvas;
+    // this.canvasWidth = this.canvas.clientWidth;
+    // this.canvasHeight = this.canvas.clientHeight;
     this.context = this.getContext();
     this.datas = options.datas;
     this.params = {
         opacity: options.opacity || 1,
-        range: options.range || 1,
+        range: options.range || [0, .9],
     }
     this.initBarrage();
     this.barrages = this.getBarrages();
@@ -78,31 +87,31 @@ BarrageUtil.prototype = {
         let me = this;
         this.barrages.forEach(barrage => {
             // barrage.x -= barrage.speed;
-            if (parseFloat(barrage.time) > me.myVideo.currentTime || (barrage.x + barrage.width) < 0) {
-                return;
-            } else {
-                barrage.draw();
-                barrage.x -= barrage.speed;
+            if (parseInt(barrage.time) === parseInt(me.myVideo.currentTime) || 
+                ((barrage.x + barrage.width) > 0 && barrage.x < me.canvas.clientWidth))  {
+                    barrage.draw(this.params);
+                    barrage.x -= barrage.speed;
             }
         });
     },
 
     //初始化弹幕并发送
     render: function() {
-        this.context.clearRect(0,0, this.canvas.width, this.canvas.height);
+        this.context.clearRect(0, 0, this.canvas.clientWidth, this.canvas.clientHeight);
         this.draw();
         this.animation = window.requestAnimationFrame(this.render.bind(this));
     },
 
     //初始化弹幕
     initBarrage: function() {
-        this.context.clearRect(0,0, this.canvas.width, this.canvas.height);
+        this.context.clearRect(0, 0, this.canvas.clientWidth, this.canvas.clientHeight);
         window.cancelAnimationFrame(this.animation);
-        // this.canvas.style.width = myVideo.clientWidth + "px";
-        // this.canvas.style.height = myVideo.clientHeight + "px";
-        this.canvas.width = myVideo.clientWidth;
-        this.canvas.height = myVideo.clientHeight;
-        this.barrages = null;
+        // let scaleX = this.canvasWidth / this.myVideo.clientWidth;
+        // let scaleY = this.canvasHeight / this.myVideo.clientHeight;
+        this.canvas.width = this.myVideo.clientWidth;
+        this.canvas.height = this.myVideo.clientHeight;
+        // this.context.scale(scaleX, scaleY);
+        // this.barrages = null;
     },
 
     //暂停弹幕运动
@@ -122,32 +131,33 @@ BarrageUtil.prototype = {
 
     //重置弹幕
     resetBarrage: function() {
+        let me = this;
         this.initBarrage();
-        this.barrages = null;
+        this.barrages.forEach(barrage => {
+            if (barrage.time < this.myVideo.currentTime) {
+                barrage.x = -1 * barrage.width;
+            } else {
+                barrage.x = me.canvas.clientWidth;
+            }
+        });
         this.render();
+    },
+
+    //销毁弹幕
+    destroy: function() {
+        this.initBarrage();
+    },
+
+    //设置弹幕透明度
+    setOpacity: function(opacity = 1) {
+        this.params.opacity = opacity;
+    },
+
+    //设置弹幕显示区域
+    setRange: function(range = [0, 1]) {
+        // this.resetBarrage();
+        this.params.range = range;
     }
-
-    // move: function () {
-    //     this.context.save();
-    //     // this.context.clearRect(0,0, this.canvas.width, this.canvas.height);
-    //     this.draw();
-    //     this.x -= this.speed;
-    //     if (this.x + this.width <= 0) {
-    //         window.cancelAnimationFrame(this.animation);
-    //         return;
-    //     }
-    //     this.context.restore();
-    //     this.animation = window.requestAnimationFrame(this.move.bind(this));
-    // },
-
-    // stop: function() {
-    //     window.cancelAnimationFrame(this.animation);
-    // },
-
-    // destroy: function() {
-    //     return;
-    //     // this.context.clearRect(0,0, this.canvas.width, this.canvas.height);
-    // }
 }
 
 

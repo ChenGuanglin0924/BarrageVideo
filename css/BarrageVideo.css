@@ -14,8 +14,8 @@
 
 .video-container {
     position: relative;
-    width: 600px;
-    height: 400px;
+    width: 800px;
+    height: 500px;
     margin: 0 auto;
     background-color: black;
 }
@@ -72,8 +72,8 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 400px;
-    height: 300px;
+    width: 300px;
+    height: 200px;
     transform: translate(-50%, -50%);
     background-color: white;
     border-radius: 4px;
@@ -260,6 +260,7 @@
 
 .time-container .time-total {
     text-align: left;
+    color: #9c9c9c;
 }
 
 /* 右侧工具栏 */
@@ -303,7 +304,6 @@
     padding-bottom: 6px;
     background-color: black;
     border-radius: 4px;
-    cursor: pointer;
 }
 
 .volume-content .volume-value {
@@ -320,6 +320,7 @@
     margin: 2px auto;
     border-radius: 4px;
     background-color: red;
+    cursor: pointer;
 }
 
 .volume-content .volume-bg {
@@ -330,6 +331,7 @@
     transform: translateX(-50%);
     border-radius: 4px;
     background-color: yellow;
+    cursor: pointer;
 }
 
 .volume-slider-bg .volume-slider {
@@ -341,7 +343,7 @@
     /* bottom: 50px; */
     border-radius: 4px;
     background-color: green;
-    
+    cursor: pointer;
 }
 
 /* 倍数播放 */
@@ -361,9 +363,11 @@
     position: absolute;
     bottom: 20px;
     margin: 0 auto;
-    width: 40px;
+    width: 50px;
     padding-bottom: 20px;
     z-index: 101;
+    left: 50%;
+    transform: translateX(-50%);
     display: none;
 }
 
@@ -379,71 +383,168 @@
 .rate-container .rate-content li {
     list-style: none;
     color: white;
-    padding: 3px;
+    padding: 5px;
 }
 
 .rate-container .rate-content li:hover {
-    background-color: #ffffff2e;
+    /* background-color: #ffffff2e; */
+    color: green;
 }
 
 .rate-container .rate-content .active {
-    background-color: #ffffff4a;
+    /* background-color: #ffffff4a; */
+    color: green;
 }
 
 /* 弹幕开关 */  
-.barrage-tool {
+.control-container .barrage-setting-container {
     position: relative;
-    top: 5px;
+}
+
+.control-container .barrage-setting-container:hover .barrage-setting-content{
+    display: block;
+}
+
+.barrage-setting-container .barrage-setting-tool {
+    font-size: 14px;
+}
+
+.barrage-setting-container .barrage-setting-content {
+    position: absolute;
+    bottom: 20px;
+    margin: 0 auto;
+    width: 200px;
+    padding-bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 101;
+    color: white;
+    font-size: 12px;
+    display: none;
+}
+
+.barrage-setting-content > div {
+    padding-bottom: 6px;
+    background-color: black;
+    border-radius: 4px;
+}
+
+.barrage-setting-content p {
+    padding: 5px;
+}
+
+.barrage-setting-content ul {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.barrage-setting-content ul li {
+    padding: 5px;
+    list-style: none;
+    text-align: center;
+    color: gray;
+    cursor: pointer;
+}
+
+.barrage-setting-content ul li:hover {
+    color: green;
+}
+
+.barrage-setting-content ul .active {
+    color: green;
+}
+
+.barrage-setting-content .barrage-opacity {
+    padding: 5px;
+}
+
+.barrage-setting-content .barrage-range {
+    padding: 5px;
+}
+
+.barrage-setting-content .barrage-range a {
+    font-size: 50px;
+    line-height: 50px;
+}
+
+.barrage-setting-content .barrage-range span {
+    font-size: 12px;
+}
+
+.barrage-setting-content .barrage-switch {
+    padding: 5px;
+}
+
+.barrage-setting-content .barrage-switch > span {
+    padding: 5px;
+}
+
+.barrage-switch .barrage-tool {
+    position: relative;
+    display: inline-block;
+    vertical-align: text-bottom;
+    top: 3px;
+    left: 35px;
     border-radius: 25px;
     box-shadow: 0 1px 1px 0 rgba(255, 255, 255, 0.5), inset 0 1px 1px 0 rgba(0, 0, 0, 0.2);
-    width: 50px;
-    height: 25px;
+    width: 65px;
+    height: 21px;
     overflow: hidden;
     transition: all .25s linear;
     cursor: pointer;
-    background-color: #fff;
+    background-color: #ffffff;
 }
-.barrage-tool .handle {
-    width: 20px;
-    height: 20px;
+.barrage-switch .barrage-tool .handle {
+    width: 16px;
+    height: 16px;
     border-radius: 20px;
     position: absolute;
     top: 3px;
-    background: #FFF;
+    background: white;
     box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.2), 0px 4px 23px 0 rgba(0, 0, 0, 0.2), -2px 4px 4px 0 rgba(0, 0, 0, 0.2);
     text-decoration: none;
     font-size: 12px;
-    line-height: 25px;
+    line-height: 11px;
     text-align: center;
-    left: 2px;
+    left: 3px;
     transition: all 0.4s cubic-bezier(0.33, 1.6, 0.66, 1);
 }
-.barrage-tool .handle:before {
-    -webkit-font-smoothing: antialiased;
+.barrage-switch .barrage-tool .handle:before {
+    content: "OFF";
+    font-size: 12px;
+    font-weight: 400;
+    color: gray;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+    position: absolute;
+    left: 25px;
+    line-height: 16px;
+    /* -webkit-font-smoothing: antialiased; */
 }
-.barrage-tool .handle:after {
+.barrage-switch .barrage-tool .handle:after {
     content: "ON";
     font-size: 12px;
     font-weight: 400;
-    color: #FFF;
+    color: green;
     text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
     position: absolute;
-    left: -24px;
-    line-height: 20px;
+    left: -30px;
+    line-height: 16px;
 }
-.barrage-tool.on {
-    background: green;
+.barrage-switch .barrage-tool.on {
+    /* background: #00000087; */
 }
-.barrage-tool.on .handle {
-    left: 28px;
-    color: green;
+.barrage-switch .barrage-tool.on .handle {
+    left: 47px;
+    background-color: green;
+    /* color: green; */
 }
   
 
 /* 中间工具栏 */
 .control-container .control-center {
     flex: 1;
-    /* margin: 0 20px; */
+    margin: 0 20px;
     box-sizing: border-box;
 }
 
@@ -462,6 +563,13 @@
     flex: 1;
 }
 
+.control-center .send-barrage-tool .send-setting-btn {
+    position: relative;
+    display: inline-block;
+    padding: 4px;
+    color: green;
+}
+
 .control-center .send-barrage-tool .send-barrage-btn {
     color: black;
     font-size: 12px;
@@ -475,4 +583,56 @@
 .control-center .send-barrage-tool .send-barrage-btn:hover {
     color: green;
 }
+
+.send-setting-tool:hover .send-setting-content {
+    display: inline-block;
+}
+
+.send-setting-tool .send-setting-content {
+    position: absolute;
+    bottom: 32px;
+    margin: 0 auto;
+    width: 200px;
+    padding-bottom: 20px;
+    /* left: 50%; */
+    transform: translateX(-50%);
+    z-index: 101;
+    color: white;
+    font-size: 12px;
+    display: none;
+}
+
+.send-setting-content > div {
+    padding-bottom: 6px;
+    background-color: black;
+    border-radius: 4px;
+}
+
+.send-setting-content p {
+    padding: 5px;
+}
+
+.send-setting-content ul {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.send-setting-content ul li {
+    padding: 5px;
+    list-style: none;
+    text-align: center;
+    color: gray;
+    cursor: pointer;
+}
+
+.send-setting-content ul li:hover {
+    color: green;
+}
+
+.send-setting-content ul .active {
+    color: green;
+}
+
+
 
