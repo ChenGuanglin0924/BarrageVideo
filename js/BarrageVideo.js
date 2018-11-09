@@ -30,8 +30,11 @@ let myVideo = document.getElementById("myVideo"),
     sendBarrageBtn = document.getElementsByClassName("send-barrage-btn")[0];
     rateContent = document.getElementsByClassName("rate-content")[0];
     barrageTool = document.getElementsByClassName("barrage-tool")[0];
-    barrageOpacity = document.getElementsByClassName("barrage-opacity")[0];
-    barrageRange = document.getElementsByClassName("barrage-range")[0];
+    barrageOpacityTool = document.getElementsByClassName("barrage-opacity")[0];
+    barrageRangeTool = document.getElementsByClassName("barrage-range")[0];
+    sendFontsizeTool = document.getElementsByClassName("send-fontsize")[0];
+    sendSpeedTool = document.getElementsByClassName("send-speed")[0];
+    sendColorTool = document.getElementsByClassName("send-color")[0];
     
 let opacityObj = {
     "无": 0.0,
@@ -40,9 +43,21 @@ let opacityObj = {
     "高": 1.0
 }
 let rangeObj = {
-    "全屏": [0, .8],
+    "全屏": [0, .9],
     "顶部": [0, .4],
     "底部": [.5, .9],
+}
+let sizeObj = {
+    "极小": 12,
+    "小": 16,
+    "正常": 20,
+    "大":24,
+    "极大": 28
+}
+let speedObj = {
+    "慢速": 1,
+    "正常": 3,
+    "快速": 5
 }
 
 let timeTotal = 0, 
@@ -58,7 +73,17 @@ let timeTotal = 0,
     barrageUtil = null,
     isFullScreen = false,
     playbackRate = 1,
-    isBarrageOn = true;
+    isBarrageOn = true,
+    barrageStyle = {
+        opacity: 1,
+        range: [0, .9]
+    },
+    sendStyle = {
+        fontSize: 20,
+        speed: 3,
+        color: "#D9E3F0"
+    },
+    isSendingBarrage = false;
 
 myVideo.addEventListener("loadeddata", initVideo); 
 myVideo.addEventListener("timeupdate", setCurrentTime);
@@ -79,13 +104,63 @@ sendBarrageBtn.addEventListener("click", sendBarrage);
 reloadToolDIV.addEventListener("click", reloadVideo);
 rateContent.addEventListener('click', changePlayRate);
 barrageTool.addEventListener('click', switchVideoBarrage);
-barrageOpacity.addEventListener('click', changeBarrageOpacity);
-barrageRange.addEventListener('click', changeBarrageRange);
+barrageOpacityTool.addEventListener('click', changeBarrageOpacity);
+barrageRangeTool.addEventListener('click', changeBarrageRange);
+sendFontsizeTool.addEventListener('click', setSendSize);
+sendSpeedTool.addEventListener('click', setSendSpeed);
+sendColorTool.addEventListener('click', setSendColor);
+sendBarrageValue.addEventListener('focus', () => {isSendingBarrage = true});
+sendBarrageValue.addEventListener('blur', () => {isSendingBarrage = false});
+
 //全屏事件监听
 document.addEventListener('fullscreenchange', changeFullScreenStatus);
 document.addEventListener('webkitfullscreenchange', changeFullScreenStatus);
 document.addEventListener('mozfullscreenchange', changeFullScreenStatus);
 document.addEventListener('MSFullscreenChange', changeFullScreenStatus);
+
+/**
+ * 设置弹幕发送字体大小
+ */
+function setSendSize(e) {
+    e.stopPropagation();
+    if (e.target.tagName === "LI") {
+        let key = e.target.innerText;
+        if (key && Object.keys(sizeObj).indexOf(key) > -1) {
+            sendStyle.fontSize = sizeObj[key];
+            removeClass(e.target.parentNode.getElementsByClassName("active")[0], "active");
+            addClass(e.target, "active");
+        }
+    }
+}
+
+/**
+ * 设置弹幕发送移动速度
+ */
+function setSendSpeed(e) {
+    e.stopPropagation();
+    if (e.target.tagName === "LI") {
+        let key = e.target.innerText;
+        if (key && Object.keys(speedObj).indexOf(key) > -1) {
+            sendStyle.speed = speedObj[key];
+            removeClass(e.target.parentNode.getElementsByClassName("active")[0], "active");
+            addClass(e.target, "active");
+        }
+    }
+}
+
+/**
+ * 设置弹幕发送显示颜色
+ */
+function setSendColor(e) {
+    e.stopPropagation();
+    let elm = e.target.tagName === "LI" ? e.target : e.target.parentNode;
+    let key = elm.style.backgroundColor;
+    if (key) {
+        sendStyle.color = key;
+        removeClass(elm.parentNode.getElementsByClassName("active")[0], "active");
+        addClass(elm, "active");
+    }
+}
 
 /**
  * 手动改变播放时间时重置弹幕
@@ -99,18 +174,15 @@ function seeked() {
  */
 function changeBarrageRange(e) {
     e.stopPropagation();
-    // let key = e.target.innerText || e.target.parentNode.innerText;
     let elm = e.target.tagName === "LI" ? e.target : e.target.parentNode;
     let key = elm.innerText;
-    let range = [0, 1];
     if (key && Object.keys(rangeObj).indexOf(key) > -1) {
-        range = rangeObj[key];
-        
+        barrageStyle.range = rangeObj[key];
         removeClass(elm.parentNode.getElementsByClassName("active")[0], "active");
         addClass(elm, "active");
     }
     if (barrageUtil) {
-        barrageUtil.setRange(range);
+        barrageUtil.setStyle(barrageStyle);
     }
 }
 
@@ -126,12 +198,11 @@ function changeBarrageOpacity(e) {
             removeClass(e.target.parentNode.getElementsByClassName("active")[0], "active");
         }
         addClass(e.target, "active");
-        let opacity = 1;
         if (Object.keys(opacityObj).indexOf(key) > -1) {
-            opacity = opacityObj[key];
+            barrageStyle.opacity = opacityObj[key];
         }
         if (barrageUtil) {
-            barrageUtil.setOpacity(opacity);
+            barrageUtil.setStyle(barrageStyle);
         }
     }
 }
@@ -154,7 +225,11 @@ function switchVideoBarrage(e) {
         if (barrageUtil) {
             barrageUtil.render();
         } else {
-            barrageUtil = new BarrageUtil(myVideo, barrageCanvas, {datas: barrages});
+            barrageUtil = new BarrageUtil(
+                myVideo, barrageCanvas, {
+                    data: barrages, 
+                    style: barrageStyle
+                });
             barrageUtil.render();
         }
     }
@@ -215,16 +290,23 @@ function reloadVideo(e) {
  */
 function sendBarrage() {
     let val = sendBarrageValue.value;
-    if (!val || val.trim() === "") {
+    if (!val || val.trim() === "" || sendBarrageBtn.className.indexOf("disable") > -1) {
         return;
     }
     barrageUtil && barrageUtil.addBarrage({
-        date: "2018-11-02",
         time: timeCurrent,
         text: val,
-        size: "16",
-        color: "yellow",
-        speed: Math.random() * 10
+        fontSize: sendStyle.fontSize,
+        color: sendStyle.color,
+        speed: sendStyle.speed
+    });
+    //弹幕发送间隔为5秒
+    timeCountdown(5, (result)=>{
+        sendBarrageBtn.innerText = result + "";
+        addClass(sendBarrageBtn, "disable");
+    }, ()=>{
+        sendBarrageBtn.innerText = "发送";
+        removeClass(sendBarrageBtn, "disable");
     });
 }
 
@@ -281,7 +363,7 @@ function mouseInVideo(e) {
     if (videoControlTimer) {
         clearTimeout(videoControlTimer);
     }
-    if (e.target === barrageCanvas && !isChangeVolume && !isChangeProcess) {
+    if (e.target === barrageCanvas && !isChangeVolume && !isChangeProcess && !isSendingBarrage) {
         videoControlTimer = setTimeout(function () {
             toggleClass(videoControl, false);
         }, 3000);
@@ -295,7 +377,7 @@ function mouseLeaveVideo() {
     if (videoControlTimer) {
         clearTimeout(videoControlTimer);
     }
-    if (!isChangeProcess && !isChangeVolume) {
+    if (!isChangeProcess && !isChangeVolume && !isSendingBarrage) {
         videoControlTimer = setTimeout(function () {
             toggleClass(videoControl, false);
         }, 3000);
@@ -725,7 +807,11 @@ function playVideo() {
     toggleClass(videoPoster, false);
     if (isBarrageOn) {
         if (!barrageUtil) {
-            barrageUtil = new BarrageUtil(myVideo, barrageCanvas, {datas: barrages});
+            barrageUtil = new BarrageUtil(
+                myVideo, barrageCanvas, {
+                    data: barrages,
+                    style: barrageStyle
+                });
             barrageUtil.render();
         } else {
             barrageUtil.runBarrage();
@@ -809,3 +895,23 @@ function removeClass(element, className) {
     }
     element.setAttribute("class", elmClass);
 }
+
+/**
+ * 发送弹幕倒计时函数
+ *
+ * @param {Number} seconds 倒计时秒数
+ * @param {Function} onCallBack 倒计时执行的方法
+ * @param {Function} endCallBack 倒计结束执行的方法
+ */
+function timeCountdown(interval, onCallBack, endCallBack) {
+    if (interval == 0) {
+        endCallBack();
+        clearTimeout(timeOut);
+    } else { 
+        onCallBack(interval);
+        interval --;
+        timeOut = setTimeout(function() { 
+            timeCountdown(interval, onCallBack, endCallBack);
+        }, 1000)
+    } 
+} 

@@ -8,10 +8,9 @@ let Barrage = function(canvas, context, options) {
     this.y = this.canvas.clientHeight * this.random;
     this.text = options.text || "";
     this.width = context.measureText(this.text).width;
-    this.fontSize = options.fontSize || 16;
-    this.color = options.color || "#fff";
-    this.speed = options.speed || 4;
-    this.date = options.date || "";
+    this.fontSize = options.fontSize || 20;
+    this.color = options.color || "#D9E3F0";
+    this.speed = options.speed || 3;
     this.time = options.time || "";
     // this.animation = null;
     // this.position = "random";  //random, top, bottom, center
@@ -28,7 +27,7 @@ let Barrage = function(canvas, context, options) {
             this.canvas.clientHeight * options.range[0] + Math.floor((options.range[1] - options.range[0]) * this.canvas.clientHeight * this.random);
         }
         this.context.textBaseline = "top";
-        this.context.font = this.fontSize + "px sans-serif";
+        this.context.font = "bold " + this.fontSize + "px sans-serif";
         this.context.fillStyle = this.color;
         this.context.fillText(this.text, this.x, this.y);
         // this.context.restore();
@@ -45,7 +44,7 @@ let Barrage = function(canvas, context, options) {
 //         speed: "5"
 //     }],  //弹幕集合
 //     opacity: 1,  //全局变量 不透明度
-//     range: 1,  //弹幕显示范围 [0-1]
+//     range: [0-.9],  //弹幕显示范围 [0-.9]
 // }
 let BarrageUtil = function(myVideo, canvas, options) {
     this.myVideo = myVideo;
@@ -53,10 +52,10 @@ let BarrageUtil = function(myVideo, canvas, options) {
     // this.canvasWidth = this.canvas.clientWidth;
     // this.canvasHeight = this.canvas.clientHeight;
     this.context = this.getContext();
-    this.datas = options.datas;
+    this.data = options.data;
     this.params = {
-        opacity: options.opacity || 1,
-        range: options.range || [0, .9],
+        opacity: options.style.opacity || 1,
+        range: options.style.range || [0, .9],
     }
     this.initBarrage();
     this.barrages = this.getBarrages();
@@ -74,8 +73,8 @@ BarrageUtil.prototype = {
     //获取barrage实例
     getBarrages: function() {
         let barrages = [], me = this;
-        if (this.datas) {
-            this.datas.forEach((data, idx) => {
+        if (this.data) {
+            this.data.forEach((data, idx) => {
                 barrages.push(new Barrage(me.canvas, me.context, data))
             });
         }
@@ -148,16 +147,12 @@ BarrageUtil.prototype = {
         this.initBarrage();
     },
 
-    //设置弹幕透明度
-    setOpacity: function(opacity = 1) {
-        this.params.opacity = opacity;
+    //设置弹幕显示样式
+    setStyle: function(style = {}) {
+        for (const key in style) {
+            this.params[key] = style[key];
+        }
     },
-
-    //设置弹幕显示区域
-    setRange: function(range = [0, 1]) {
-        // this.resetBarrage();
-        this.params.range = range;
-    }
 }
 
 

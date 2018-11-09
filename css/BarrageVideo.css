@@ -12,6 +12,10 @@
     display: block !important;
 }
 
+.disable {
+    cursor: not-allowed !important;
+}
+
 .video-container {
     position: relative;
     width: 800px;
@@ -566,8 +570,11 @@
 .control-center .send-barrage-tool .send-setting-btn {
     position: relative;
     display: inline-block;
+    margin: 0 2px;
+    font-size: 12px;
     padding: 4px;
     color: green;
+    cursor: pointer;
 }
 
 .control-center .send-barrage-tool .send-barrage-btn {
@@ -582,6 +589,11 @@
 
 .control-center .send-barrage-tool .send-barrage-btn:hover {
     color: green;
+}
+
+.send-setting-tool:hover .send-setting-btn {
+    border: 1px solid green;
+    border-radius: 20px;
 }
 
 .send-setting-tool:hover .send-setting-content {
@@ -603,9 +615,18 @@
 }
 
 .send-setting-content > div {
-    padding-bottom: 6px;
+    padding: 0 6px;
     background-color: black;
-    border-radius: 4px;
+}
+
+.send-setting-content > div:first-child {
+    border-radius: 4px 4px 0 0;
+    padding-top: 5px;
+}
+
+.send-setting-content > div:last-child {
+    border-radius: 0 0 4px 4px;
+    padding-bottom: 6px;
 }
 
 .send-setting-content p {
@@ -616,6 +637,7 @@
     display: flex;
     justify-content: space-around;
     align-items: center;
+    padding: 5px;
 }
 
 .send-setting-content ul li {
@@ -633,6 +655,48 @@
 .send-setting-content ul .active {
     color: green;
 }
+
+.send-setting-content .send-color ul {
+    /* display: flex;
+    justify-content: space-around;
+    align-items: center; */
+}
+
+.send-setting-content .send-color ul li {
+    width: 16px;
+    height: 16px;
+    padding: 0;
+}
+
+.send-setting-content .send-color ul li a {
+    display: none;
+    font-size: 12px;
+    line-height: 16px;
+    text-align: center;
+}
+
+.send-setting-content .send-color ul .active a {
+    display: block !important;
+}
+
+.send-setting-content .send-color ul li:hover a{
+    display: block;
+    
+}
+
+/* .send-setting-content .send-color ul li {
+    width: 6px;
+    height: 6px;
+    padding: 0;
+    font-size: 12px;
+    text-align: center;
+    line-height: 16px;
+} */
+
+/* .send-setting-content .send-color ul .h5-video-selected {
+    width: 6px;
+    height: 6px;
+} */
 
 
 
