@@ -33,6 +33,20 @@
     z-index: 100;
 }
 
+/* 提示信息 */
+.message-bottom {
+    position: absolute;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: #000000cf;
+    color: white;
+    z-index: 110;
+}
+
 /* 弹幕 */
 .video-barrage {
     position: absolute;
@@ -264,7 +278,7 @@
 
 .time-container .time-total {
     text-align: left;
-    color: #9c9c9c;
+    color: #b5b5b5;
 }
 
 /* 右侧工具栏 */
@@ -573,7 +587,9 @@
     margin: 0 2px;
     font-size: 12px;
     padding: 4px;
-    color: green;
+    border-radius: 20px;
+    border: 1px solid #908b8b;
+    color: #9a9696;
     cursor: pointer;
 }
 
@@ -593,7 +609,7 @@
 
 .send-setting-tool:hover .send-setting-btn {
     border: 1px solid green;
-    border-radius: 20px;
+    color: green;
 }
 
 .send-setting-tool:hover .send-setting-content {
@@ -654,12 +670,6 @@
 
 .send-setting-content ul .active {
     color: green;
-}
-
-.send-setting-content .send-color ul {
-    /* display: flex;
-    justify-content: space-around;
-    align-items: center; */
 }
 
 .send-setting-content .send-color ul li {
