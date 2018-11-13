@@ -1,0 +1,37 @@
+
+/*动画效果*/
+@keyframes fadeIn {
+	0% {
+	    opacity: 0; /*初始状态 透明度为0*/
+	}
+	20%{
+		opacity: .2;
+	}
+	50% {
+		opacity: .5; /*中间状态 透明度为0.5*/
+	}
+	70%{
+		opacity: .7;
+	}
+	100% {
+		opacity: 1; /*结尾状态 透明度为1*/
+	}
+}
+
+@keyframes fadeOut {
+	0% {
+	    opacity: 1; /*初始状态 透明度为1*/
+	}
+	20%{
+		opacity: .7;
+	}
+	50% {
+		opacity: .5; /*中间状态 透明度为0.5*/
+	}
+	70%{
+		opacity: .2;
+	}
+	100% {
+		opacity: 0; /*结尾状态 透明度为1*/
+	}
+}

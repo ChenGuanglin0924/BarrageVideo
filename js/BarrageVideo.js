@@ -61,13 +61,15 @@ let speedObj = {
     "快速": 5
 }
 
+const VOLUME_SLIDER_BG_HEIGHT = 100;
+
 let timeTotal = 0, 
     timeCurrent = 0, 
     timeCache = 0, 
     isFullScreen = false,
     isProcessMove = false,
-    volume = 50,
-    muted = false,
+    videoVolume = 50,
+    videoMuted = false,
     videoControlTimer = null,
     isChangeProcess = false
     isChangeVolume = false,
@@ -85,7 +87,8 @@ let timeTotal = 0,
         color: "#D9E3F0"
     },
     isSendingBarrage = false,
-    bottomMessageTimer = null;
+    bottomMessageTimer = null,
+    firstClickTime = null;  //用来记录双击事件中第一次点击的时间
 
 myVideo.addEventListener("loadeddata", initVideo); 
 myVideo.addEventListener("timeupdate", setCurrentTime);
@@ -101,6 +104,7 @@ volumeToolDIV.addEventListener("mousedown", changeVolumeMute);
 videoContainer.addEventListener("mouseenter", mouseOverVideo);
 videoContainer.addEventListener("mouseleave", mouseLeaveVideo);
 videoContainer.addEventListener("click", videoClicked);
+videoContainer.addEventListener("dblclick", videoDBClicked);
 videoControl.addEventListener("mouseover", showVideoControl);
 videoPoster.addEventListener("click", go2PosterUrl);
 sendBarrageBtn.addEventListener("click", sendBarrage);
@@ -121,21 +125,64 @@ document.addEventListener('webkitfullscreenchange', changeFullScreenStatus);
 document.addEventListener('mozfullscreenchange', changeFullScreenStatus);
 document.addEventListener('MSFullscreenChange', changeFullScreenStatus);
 //监听键盘点击事件
-// videoContainer.addEventListener('mouseover', ()=>{
-//     document.addEventListener('keyup', keyUpEvent);
-// });
+videoContainer.addEventListener('keyup', keyUpEvent);
 
-// barrageCanvas.addEventListener('mouseout', ()=>{
-//     document.removeEventListener('keyup', keyUpEvent);
-// });
-
-// function keyUpEvent(e) {
-//     if (e.keyCode === 38) {
-//         volume += 5;
-//         updateVolume(volume);
-//         showMessage("音量 " + volume, 2000);
-//     }
-// }
+/**
+ *键盘事件
+ * @param {Event} e
+ */
+function keyUpEvent(e) {
+    e.stopPropagation();
+    e.preventDefault();
+    switch (e.keyCode) {
+        //上
+        case 38:
+            videoVolume = videoMuted ? 0 : videoVolume;
+            videoVolume = videoVolume >= 100 ? 100 : videoVolume + 5;
+            videoMuted = videoMuted ? false : videoMuted;
+            updateVolume(videoVolume, videoMuted);
+            showMessage("音量 " + videoVolume, 2000);
+            break;
+        //下
+        case 40:
+            if(!videoMuted) {
+                videoVolume = videoVolume <= 0 ? 0 : videoVolume - 5;
+                updateVolume(videoVolume, videoMuted);
+                showMessage("音量 " + videoVolume, 2000);
+            } else{
+                showMessage("音量 " + 0, 2000);
+            }
+            break;
+        //左
+        case 37:
+            timeCurrent = timeCurrent <= 0 ? 0 : timeCurrent - 10;
+            updateCurrentProcess(timeCurrent);
+            showMessage("快退 10s", 2000);
+        break;
+        //右
+        case 39:
+            timeCurrent = timeCurrent >= timeTotal ? timeTotal : timeCurrent + 10;
+            updateCurrentProcess(timeCurrent);
+            showMessage("快进 10s", 2000);
+            break;
+        //空格
+        case 32:
+            if (document.activeElement !== sendBarrageValue) {
+                changePlayStatus();
+            }
+            break;  
+        //回车
+        case 13:
+        case 108:
+            if (document.activeElement === sendBarrageValue) {
+                sendBarrage();
+            }
+            break;  
+        default:
+            break;
+    }
+    return false;
+}
 
 /**
  * 设置弹幕发送字体大小
@@ -309,11 +356,20 @@ function reloadVideo(e) {
  */
 function sendBarrage() {
     let val = sendBarrageValue.value;
-    if (!val || val.trim() === "" || sendBarrageBtn.className.indexOf("disable") > -1 || timeCurrent <= 0) {
+    if (sendBarrageBtn.className.indexOf("disable") > -1 || timeCurrent <= 0) {
         return;
     }
+    if (val.length > 25) {
+        showMessage("弹幕不能贪多，最多25个字哦~", 2000);
+        return;
+    }
+    if (!val || val.trim() === "") {
+        showMessage("不能发送空弹幕哦~", 2000);
+        return;
+    }
+    sendBarrageValue.value = "";
     barrageUtil && barrageUtil.addBarrage({
-        time: timeCurrent,
+        time: timeCurrent + 1,  //时间+1保证弹幕能够发出
         text: val,
         fontSize: sendStyle.fontSize,
         color: sendStyle.color,
@@ -362,7 +418,21 @@ function go2PosterUrl(e) {
  */
 function videoClicked(e) {
     if (e.target === barrageCanvas) {
-        changePlayStatus();
+        clearTimeout(firstClickTime);
+        firstClickTime = setTimeout(() => {
+            changePlayStatus(); 
+        }, 300);
+    }
+}
+
+/**
+ * 视频双击事件
+ * @param {Event} e 
+ */
+function videoDBClicked(e) {
+    if (e.target === barrageCanvas) {
+        clearTimeout(firstClickTime);
+        changeScreenStatus();
     }
 }
 
@@ -431,17 +501,20 @@ function hideVideoControl() {
  * 切换静音和非静音状态
  */
 function changeVolumeMute() {
-    muted = !muted;
-    myVideo.muted = muted;
-    if (muted) {
-        updateVolume(0, muted);
-    }
-    else {
-        if (volume === 0) {
-            volume = 50;
-        }
-        updateVolume(volume, muted);
-    }
+    videoMuted = videoVolume === 0 ? false : !videoMuted;
+    videoVolume = videoVolume === 0 ? 50 : videoVolume;
+    updateVolume(videoVolume, videoMuted);
+    // videoMuted = !videoMuted;
+    // myVideo.muted = videoMuted;
+    // if (videoMuted) {
+    //     updateVolume(0, videoMuted);
+    // }
+    // else {
+    //     if (videoVolume === 0) {
+    //         videoVolume = 50;
+    //     }
+    //     updateVolume(videoVolume, videoMuted);
+    // }
 }
 
 /**
@@ -449,7 +522,7 @@ function changeVolumeMute() {
  * @param {Number} volume 音量大小
  * @param {Boolean} muted 是否静音
  */
-function updateVolume(volume, muted) {
+function updateVolume(volume = 50, muted = false) {
     let delta = volumeSliderDIV.offsetHeight / 2;
     if (volume === 0 || muted) {
         removeClass(volumeToolDIV, "h5-video-volume-on");
@@ -465,6 +538,10 @@ function updateVolume(volume, muted) {
         volumeBgDIV.style.height = volume + "%";
         volumeValueDIV.innerText = volume + "%";
     }
+    // videoVolume = volume;
+    myVideo.volume = volume / VOLUME_SLIDER_BG_HEIGHT;
+    // videoMuted = muted;
+    myVideo.muted = muted;
 }
 
 /**
@@ -476,24 +553,14 @@ function changeVideoVolume(e) {
     if (e.button !== 0) {
         return;
     }
-    let volumeSliderBgHeight = volumeSliderBgDIV.offsetHeight;
     // let delta = volumeSliderDIV.offsetHeight / 2;
     if (e.target === volumeSliderBgDIV || e.target === volumeBgDIV) {
         let top = e.target === volumeSliderBgDIV ? e.offsetY : e.offsetY + e.target.offsetTop; 
         top = top < 0 ? 0 : top;
-        top = top > volumeSliderBgHeight ? volumeSliderBgHeight : top;
+        top = top > VOLUME_SLIDER_BG_HEIGHT ? VOLUME_SLIDER_BG_HEIGHT : top;
 
-        volume = 100 - top;
-        myVideo.volume = volume / volumeSliderBgHeight;
-        if (muted && volume > 0) {
-            muted = !muted;
-            myVideo.muted = muted;
-        }
-        if (volume === 0) {
-            muted = true;
-            myVideo.muted = muted;
-        }
-        updateVolume(volume, muted);
+        videoVolume = 100 - top;
+        updateVolume(videoVolume, videoMuted);
     } else if(e.target === volumeSliderDIV) {
         isChangeVolume = true;
         addClass(volumeContentDIV, "show");
@@ -520,17 +587,8 @@ function VolumeBarDragging(top, e) {
     if (yTop >= volumeSliderBgDIV.clientHeight) {
         yTop = volumeSliderBgDIV.clientHeight;
     };
-    volume = 100 - yTop;
-    myVideo.volume = volume / volumeSliderBgDIV.clientHeight;
-    if (muted && volume > 0) {
-        muted = !muted;
-        myVideo.muted = muted;
-    }
-    if (volume === 0) {
-        muted = true;
-        myVideo.muted = muted;
-    }
-    updateVolume(volume, muted);
+    videoVolume = 100 - yTop;
+    updateVolume(videoVolume, videoMuted);
 }
 
 /**
@@ -554,9 +612,10 @@ function processMousedown(e) {
     }
     let left = getProcessLeft(e);
     let percentLeft = left / processContainerDIV.offsetWidth;
-    myVideo.currentTime = percentLeft * timeTotal;
-    adjustToolDIV.style.left = percentLeft * 100 + "%";
-
+    timeCurrent = percentLeft * timeTotal;
+    // myVideo.currentTime = timeCurrent
+    // adjustToolDIV.style.left = percentLeft * 100 + "%";
+    updateCurrentProcess(timeCurrent);
     //拖动时一直显示进度条
     isChangeProcess = true;
     addClass(processContainerDIV, "process-active");
@@ -586,8 +645,11 @@ function processMousemove(e) {
     infoLeft = infoLeft > left + delta ? left + delta : infoLeft;
     
     let percentLeft = left / processBarWidth;
-    adjustToolDIV.style.left = percentLeft * 100 + "%";
-    myVideo.currentTime = percentLeft * timeTotal;
+    timeCurrent = percentLeft * timeTotal;
+    // adjustToolDIV.style.left = percentLeft * 100 + "%";
+    // myVideo.currentTime = timeCurrent;
+
+    updateCurrentProcess(timeCurrent);
 
     processInfoDIV.style.left = infoLeft / processBarWidth * 100 + "%";
     processInfoDIV.innerText = formatTime(percentLeft * timeTotal);
@@ -663,30 +725,16 @@ function setCacheTime() {
 
 /**
  * 获取视频播放进度条长度
+ * @param {Number} 播放时间
  */
-function updateCurrentProcess() {
+function updateCurrentProcess(currentTime) {
     let width = 100 * (timeCurrent / timeTotal);
     playBar.style.width = width + "%";
     adjustToolDIV.style.left = width + "%";
+    if (currentTime) {
+        myVideo.currentTime = currentTime;
+    }
 }
-
-/**
- * 更新弹幕幕布尺寸
- * @param {Boolean} isFullScreen  是否全屏
- */
-// function resetCanvasSize(isFullScreen) {
-//     if (isFullScreen !== undefined && isFullScreen !== null) {
-//         isFullScreen = !isFullScreen;
-//     }
-//     // barrageCanvas.width = myVideo.clientWidth;
-//     // barrageCanvas.height = myVideo.clientHeight - 60;
-//     if (barrageUtil) {
-//         barrageUtil.resetBarrage();
-//     } else {
-//         barrageUtil = new BarrageUtil(myVideo, barrageCanvas, {datas: barrages});
-//         barrageUtil.render();
-//     }
-// }
 
 /**
  * 全屏
@@ -767,10 +815,10 @@ function setCurrentTime() {
  */
 function initVideo() {
     //初始化音量大小
-    myVideo.volume = volume / 100;
-    volumeValueDIV.innerText = volume + "%";
-    volumeBgDIV.style.height = volume + "%";
-    volumeSliderDIV.style.top = 100 - volume - volumeSliderDIV.offsetHeight / 2 + "%";
+    myVideo.volume = videoVolume / 100;
+    volumeValueDIV.innerText = videoVolume + "%";
+    volumeBgDIV.style.height = videoVolume + "%";
+    volumeSliderDIV.style.top = 100 - videoVolume - volumeSliderDIV.offsetHeight / 2 + "%";
     //初始化视频总时长
     timeTotal = myVideo.duration;
     timeTotalDIV.innerText = formatTime(timeTotal);
@@ -782,8 +830,10 @@ function initVideo() {
 function changePlayStatus() {
     if (myVideo.paused || myVideo.ended) {
         playVideo();
+        showMessage("播放", 2000);
     } else {
         pauseVideo();
+        showMessage("暂停", 2000);
     }
 }
 

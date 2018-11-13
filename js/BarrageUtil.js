@@ -27,7 +27,7 @@ let Barrage = function(canvas, context, options) {
             this.canvas.clientHeight * options.range[0] + Math.floor((options.range[1] - options.range[0]) * this.canvas.clientHeight * this.random);
         }
         this.context.textBaseline = "top";
-        this.context.font = "bold " + this.fontSize + "px sans-serif";
+        this.context.font = this.fontSize + "px sans-serif";
         this.context.fillStyle = this.color;
         this.context.fillText(this.text, this.x, this.y);
         // this.context.restore();
