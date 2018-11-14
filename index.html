@@ -9,11 +9,12 @@
     <link rel="stylesheet" href="./css/Animation.css">
     <link rel="stylesheet" href="./css/BarrageVideo.css">
     <link rel="stylesheet" href="./css/Loading.css">
+    <link rel="stylesheet" href="./css/FullScreen.css">
 </head>
 <body>
     <div class="video-container" tabindex="0">
         <!-- 播放器 -->
-        <video id="myVideo" src="http://pcdownaliyun.titan.mgtv.com/c1/2018/09/24_0/083D97A367D97139C57723FB1D23BA52_20180924_1_1_1622.mp4?arange=0&pm=G04PAo6W7Yj4CEZoW6gx~3nTmRbZHKXYh3JHXOU8OyAeCLEXgknwHtDEK521B6Mt~vhwhJWffqOsEK2o7V4LwPIZ_Ut16~H2XgXD_2sOZZkCxHiZrxVUwUsBo7B5JBDSoh3Im9tqMELqUgjWMMwsaUBcxZxB9s7~pvCLZWROB1Z9iwhOMAGmNXtdLyeRYbJfVY4JBghmW~b22ihIyReGRub6doi1W~KNj5pPIheWaC5T0z7eHf8OpTC0B8QM31GD90qLN_NCG_2shL2x4WIQ32gq9tCegN9kO1IyDPFfA7SAzcOUm6Z~xLC1Gc6bU5GRPr3RmBGZcSf9e6e0prGYKgSFzemhUyr2IeMBgmdAZjWQVDk1xHfuSGxSA_ZDxCCTXy~0sVVfulFQupMa5NRIVw--&vcdn=0&scid=25021">您的浏览器不支持 video 标签。</video>
+        <video id="myVideo" preload="preload" src="./resources/videos/快把我哥带走.Go.Brother.2018.HD1080P.国语中字.mp4">您的浏览器不支持 video 标签。</video>
         <!-- 弹幕 -->
         <div class="video-barrage">
             <canvas id="barrageCanvas"></canvas>
@@ -188,10 +189,41 @@
                 </div>
             </div>
         </div>
+        <!-- 顶部菜单 -->
+        <div class="video-top-menu hide">
+            <p class="video-title">快把我哥带走</p>
+            <ul class="video-size">
+                <li>
+                    <a class="h5-video-barrage-all"></a>
+                    <span>50%</span>
+                </li>
+                <li>
+                    <a class="h5-video-barrage-all"></a>
+                    <span>75%</span>
+                </li>
+                <li class="active">
+                    <a class="h5-video-barrage-all"></a>
+                    <span>100%</span>
+                </li>
+                <li>
+                    <a class="h5-video-barrage-all"></a>
+                    <span>FillScreen</span>
+                </li>
+            </ul>
+            <span class="local-time">19:52</span>
+        </div>
     </div>
 </body>
-<script src="./resources/datas/barrages.js" async></script>
-<script src="./js/BarrageVideo.js" async></script>
-<!-- <script src="./js/Barrage.js" async></script> -->
-<script src="./js/BarrageUtil.js" async></script>
+<script src="./js/Util.js"></script>
+<script src="./resources/datas/barrages.js"></script>
+<script src="./js/BarrageVideo.js"></script>
+<script src="./js/BarrageUtil.js"></script>
+<script>
+    window.onload = () => {
+        let localTime = document.getElementsByClassName("local-time")[0];
+        setInterval(() => {
+            localTime.innerHTML = Util.getLocalTime();
+        }, 1000 * 60)
+    }
+</script>
 </html>

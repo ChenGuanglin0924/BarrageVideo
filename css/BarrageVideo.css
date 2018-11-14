@@ -4,8 +4,18 @@
     padding: 0;
 }
 
+li {
+    list-style: none;
+}
+
 .hide {
     display: none !important;
+}
+
+.flex {
+    display: flex !important;
+    animation: fadeIn .3s normal;
+    -webkit-animation: fadeIn .3s normal; /* Safari 和 Chrome */
 }
 
 .show {
@@ -34,8 +44,11 @@
     position: absolute;
     width: 100%;
     height: 100%;
-    z-index: 100;
-    /* object-fit: fill; */
+    object-fit: contain;
+    margin: 0 auto;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     z-index: 100;
 }
 
@@ -113,7 +126,11 @@
     width: 100%;
     user-select: none;
     /* display: none; */
-    background-color: rgba(0, 0, 0, 0.2);
+    background: -webkit-linear-gradient(bottom, rgba(0,0,0,1), rgba(0,0,0,0));
+    background: -o-linear-gradient(bottom, rgba(0,0,0,1), rgba(0,0,0,0));
+    background: -moz-linear-gradient(bottom, rgba(0,0,0,1), rgba(0,0,0,0));
+    background: linear-gradient(bottom, rgba(0,0,0,1), rgba(0,0,0,0));
+    /* background-color: rgba(0, 0, 0, 0.2); */
     /* -moz-box-shadow: inset 0px -10px 100px -10px #333;
     -webkit-box-shadow: inset 0px -10px 100px -10px #333;
     box-shadow: inset 0px -10px 100px -10px #333; */
@@ -382,7 +399,6 @@
 }
 
 .rate-container .rate-content li {
-    list-style: none;
     color: white;
     padding: 5px;
 }
@@ -444,7 +460,6 @@
 
 .barrage-setting-content ul li {
     padding: 5px;
-    list-style: none;
     text-align: center;
     color: gray;
     cursor: pointer;
@@ -646,7 +661,6 @@
 
 .send-setting-content ul li {
     padding: 5px;
-    list-style: none;
     text-align: center;
     color: gray;
     cursor: pointer;
@@ -682,19 +696,70 @@
     
 }
 
-/* .send-setting-content .send-color ul li {
-    width: 6px;
-    height: 6px;
-    padding: 0;
+/* 顶部菜单 */
+.video-container .video-top-menu {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    padding: 16px 20px;
+    box-sizing: border-box;
+    user-select: none;
+    justify-content: space-between;
+    align-items: center;
+    background: -webkit-linear-gradient(top, rgba(0,0,0,1), rgba(0,0,0,0));
+    background: -o-linear-gradient(top, rgba(0,0,0,1), rgba(0,0,0,0));
+    background: -moz-linear-gradient(top, rgba(0,0,0,1), rgba(0,0,0,0));
+    background: linear-gradient(top, rgba(0,0,0,1), rgba(0,0,0,0));
+    /* background-color: rgba(0, 0, 0, 0.2); */
+    color: #fff;
     font-size: 12px;
-    text-align: center;
-    line-height: 16px;
-} */
+    z-index: 110;
+}
 
-/* .send-setting-content .send-color ul .h5-video-selected {
-    width: 6px;
-    height: 6px;
-} */
+.video-top-menu .video-title {
+    flex: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.video-top-menu .video-size {
+    display: flex;
+    flex: 3;
+    justify-content: center;
+}
+
+.video-top-menu .video-size li {
+    display: flex;
+    align-items: center;
+    margin: 0 10px;
+}
+
+.video-top-menu .video-size li:hover {
+    color: green;
+    cursor: pointer;
+}
+
+.video-top-menu .video-size .active {
+    color: green;
+}
+
+.video-top-menu .video-size a {
+    margin: 0 5px;
+    font-size: 24px;
+    line-height: 24px;
+}
+
+.video-top-menu .video-size span {
+    font-size: 12px;
+}
+
+.video-top-menu .local-time {
+    display: flex;
+    flex-direction: row-reverse;
+    flex: 2;
+}
+
 
 
 

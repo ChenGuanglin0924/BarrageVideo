@@ -35,7 +35,8 @@ let myVideo = document.getElementById("myVideo"),
     sendFontsizeTool = document.getElementsByClassName("send-fontsize")[0];
     sendSpeedTool = document.getElementsByClassName("send-speed")[0];
     sendColorTool = document.getElementsByClassName("send-color")[0];
-    messageBottom = document.getElementsByClassName("message-bottom")[0];
+    videoTopMenu = document.getElementsByClassName("video-top-menu")[0];
+    videoSizeTool = document.getElementsByClassName("video-size")[0];
     
 let opacityObj = {
     "无": 0.0,
@@ -48,7 +49,7 @@ let rangeObj = {
     "顶部": [0, .4],
     "底部": [.5, .9],
 }
-let sizeObj = {
+let barrageSizeObj = {
     "极小": 12,
     "小": 16,
     "正常": 20,
@@ -87,53 +88,85 @@ let timeTotal = 0,
         color: "#D9E3F0"
     },
     isSendingBarrage = false,
-    bottomMessageTimer = null,
     firstClickTime = null;  //用来记录双击事件中第一次点击的时间
 
-myVideo.addEventListener("loadeddata", initVideo); 
-myVideo.addEventListener("timeupdate", setCurrentTime);
-myVideo.addEventListener("progress", setCacheTime);
-// myVideo.addEventListener("waiting", videoWaitting);
-myVideo.addEventListener("seeked", seeked);
-playToolDIV.addEventListener("click", changePlayStatus);
-fullscreenToolDIV.addEventListener("click", changeScreenStatus);
-processContainerDIV.addEventListener("mousedown", processMousedown);
-processContainerDIV.addEventListener("mousemove", showProcessInfo);
-volumeSliderBgDIV.addEventListener("mousedown", changeVideoVolume);
-volumeToolDIV.addEventListener("mousedown", changeVolumeMute);
-videoContainer.addEventListener("mouseenter", mouseOverVideo);
-videoContainer.addEventListener("mouseleave", mouseLeaveVideo);
-videoContainer.addEventListener("click", videoClicked);
-videoContainer.addEventListener("dblclick", videoDBClicked);
-videoControl.addEventListener("mouseover", showVideoControl);
-videoPoster.addEventListener("click", go2PosterUrl);
-sendBarrageBtn.addEventListener("click", sendBarrage);
-reloadToolDIV.addEventListener("click", reloadVideo);
-rateContent.addEventListener('click', changePlayRate);
-barrageTool.addEventListener('click', switchVideoBarrage);
-barrageOpacityTool.addEventListener('click', changeBarrageOpacity);
-barrageRangeTool.addEventListener('click', changeBarrageRange);
-sendFontsizeTool.addEventListener('click', setSendSize);
-sendSpeedTool.addEventListener('click', setSendSpeed);
-sendColorTool.addEventListener('click', setSendColor);
-sendBarrageValue.addEventListener('focus', () => {isSendingBarrage = true});
-sendBarrageValue.addEventListener('blur', () => {isSendingBarrage = false});
+Util.addEvent(myVideo, "loadeddata", initVideo);
+Util.addEvent(myVideo, "timeupdate", setCurrentTime);
+Util.addEvent(myVideo, "progress", setCacheTime);
+Util.addEvent(myVideo, "waiting", showLoading);
+Util.addEvent(myVideo, "canplaythrough", hideLoading);
+Util.addEvent(myVideo, "seeked", seeked);
+Util.addEvent(playToolDIV, "click", changePlayStatus);
+Util.addEvent(fullscreenToolDIV, "click", changeScreenStatus);
+Util.addEvent(processContainerDIV, "mousedown", processMousedown);
+Util.addEvent(processContainerDIV, "mousemove", showProcessInfo);
+Util.addEvent(volumeSliderBgDIV, "mousedown", changeVideoVolume);
+Util.addEvent(volumeToolDIV, "mousedown", changeVolumeMute);
+Util.addEvent(videoContainer, "mouseenter", mouseOverVideo);
+Util.addEvent(videoContainer, "mouseleave", mouseLeaveVideo);
+Util.addEvent(videoContainer, "click", videoClicked);
+Util.addEvent(videoContainer, "dblclick", videoDBClicked);
+Util.addEvent(videoControl, "mouseover", showVideoControl);
+Util.addEvent(videoTopMenu, "mouseover", showVideoControl);
+Util.addEvent(videoPoster, "click", go2PosterUrl);
+Util.addEvent(sendBarrageBtn, "click", sendBarrage);
+Util.addEvent(reloadToolDIV, "click", reloadVideo);
+Util.addEvent(rateContent, "click", changePlayRate);
+Util.addEvent(barrageTool, "click", switchVideoBarrage);
+Util.addEvent(barrageOpacityTool, "click", changeBarrageOpacity);
+Util.addEvent(barrageRangeTool, "click", changeBarrageRange);
+Util.addEvent(sendFontsizeTool, "click", setSendSize);
+Util.addEvent(sendSpeedTool, "click", setSendSpeed);
+Util.addEvent(sendColorTool, "click", setSendColor);
+Util.addEvent(sendBarrageValue, "focus", () => {isSendingBarrage = true});
+Util.addEvent(sendBarrageValue, "blur", () => {isSendingBarrage = false});
+Util.addEvent(videoSizeTool, "click", changeVideoSize);
 
 //全屏事件监听
-document.addEventListener('fullscreenchange', changeFullScreenStatus);
-document.addEventListener('webkitfullscreenchange', changeFullScreenStatus);
-document.addEventListener('mozfullscreenchange', changeFullScreenStatus);
-document.addEventListener('MSFullscreenChange', changeFullScreenStatus);
+Util.addEvent(document, "fullscreenchange", changeFullScreenStatus);
+Util.addEvent(document, "webkitfullscreenchange", changeFullScreenStatus);
+Util.addEvent(document, "mozfullscreenchange", changeFullScreenStatus);
+Util.addEvent(document, "MSFullscreenChange", changeFullScreenStatus);
 //监听键盘点击事件
-videoContainer.addEventListener('keyup', keyUpEvent);
+Util.addEvent(videoContainer, "keyup", keyUpEvent);
+Util.addEvent(myVideo, "error", videoError);
+
+/**
+ *全屏状态下改变video尺寸
+ * @param {Event} e
+ */
+function changeVideoSize(e) {
+    e.stopPropagation();
+    let elm = e.target.tagName === "LI" ? e.target : e.target.parentNode;
+    if (elm.tagName !== "LI") {
+        return;
+    }
+    let size = elm.innerText.trim();
+    if (size === "FillScreen") {
+        myVideo.style.objectFit = "fill";
+        myVideo.style.width = "100%";
+        myVideo.style.height = "100%";
+    } else {
+        myVideo.style.objectFit = "contain";
+        myVideo.style.width = size;
+        // myVideo.style.height = size;
+    }
+    Util.removeClass(elm.parentNode.getElementsByClassName("active")[0], "active");
+    Util.addClass(elm, "active");
+}
+
+/**
+ * 视频错误
+ */
+function videoError() {
+    Util.showMessage("视频错误", 5000);
+}
 
 /**
  *键盘事件
  * @param {Event} e
  */
 function keyUpEvent(e) {
-    e.stopPropagation();
-    e.preventDefault();
     switch (e.keyCode) {
         //上
         case 38:
@@ -141,29 +174,29 @@ function keyUpEvent(e) {
             videoVolume = videoVolume >= 100 ? 100 : videoVolume + 5;
             videoMuted = videoMuted ? false : videoMuted;
             updateVolume(videoVolume, videoMuted);
-            showMessage("音量 " + videoVolume, 2000);
+            Util.showMessage("音量 " + videoVolume, 2000);
             break;
         //下
         case 40:
             if(!videoMuted) {
                 videoVolume = videoVolume <= 0 ? 0 : videoVolume - 5;
                 updateVolume(videoVolume, videoMuted);
-                showMessage("音量 " + videoVolume, 2000);
+                Util.showMessage("音量 " + videoVolume, 2000);
             } else{
-                showMessage("音量 " + 0, 2000);
+                Util.showMessage("音量 " + 0, 2000);
             }
             break;
         //左
         case 37:
             timeCurrent = timeCurrent <= 0 ? 0 : timeCurrent - 10;
             updateCurrentProcess(timeCurrent);
-            showMessage("快退 10s", 2000);
+            Util.showMessage("快退 10s", 2000);
         break;
         //右
         case 39:
             timeCurrent = timeCurrent >= timeTotal ? timeTotal : timeCurrent + 10;
             updateCurrentProcess(timeCurrent);
-            showMessage("快进 10s", 2000);
+            Util.showMessage("快进 10s", 2000);
             break;
         //空格
         case 32:
@@ -191,10 +224,10 @@ function setSendSize(e) {
     e.stopPropagation();
     if (e.target.tagName === "LI") {
         let key = e.target.innerText;
-        if (key && Object.keys(sizeObj).indexOf(key) > -1) {
-            sendStyle.fontSize = sizeObj[key];
-            removeClass(e.target.parentNode.getElementsByClassName("active")[0], "active");
-            addClass(e.target, "active");
+        if (key && Object.keys(barrageSizeObj).indexOf(key) > -1) {
+            sendStyle.fontSize = barrageSizeObj[key];
+            Util.removeClass(e.target.parentNode.getElementsByClassName("active")[0], "active");
+            Util.addClass(e.target, "active");
         }
     }
 }
@@ -208,8 +241,8 @@ function setSendSpeed(e) {
         let key = e.target.innerText;
         if (key && Object.keys(speedObj).indexOf(key) > -1) {
             sendStyle.speed = speedObj[key];
-            removeClass(e.target.parentNode.getElementsByClassName("active")[0], "active");
-            addClass(e.target, "active");
+            Util.removeClass(e.target.parentNode.getElementsByClassName("active")[0], "active");
+            Util.addClass(e.target, "active");
         }
     }
 }
@@ -223,8 +256,8 @@ function setSendColor(e) {
     let key = elm.style.backgroundColor;
     if (key) {
         sendStyle.color = key;
-        removeClass(elm.parentNode.getElementsByClassName("active")[0], "active");
-        addClass(elm, "active");
+        Util.removeClass(elm.parentNode.getElementsByClassName("active")[0], "active");
+        Util.addClass(elm, "active");
     }
 }
 
@@ -244,8 +277,8 @@ function changeBarrageRange(e) {
     let key = elm.innerText;
     if (key && Object.keys(rangeObj).indexOf(key) > -1) {
         barrageStyle.range = rangeObj[key];
-        removeClass(elm.parentNode.getElementsByClassName("active")[0], "active");
-        addClass(elm, "active");
+        Util.removeClass(elm.parentNode.getElementsByClassName("active")[0], "active");
+        Util.addClass(elm, "active");
     }
     if (barrageUtil) {
         barrageUtil.setStyle(barrageStyle);
@@ -261,9 +294,9 @@ function changeBarrageOpacity(e) {
         let key = e.target.innerText;
         let elm = e.target.parentNode.getElementsByClassName("active");
         if (elm) {
-            removeClass(e.target.parentNode.getElementsByClassName("active")[0], "active");
+            Util.removeClass(e.target.parentNode.getElementsByClassName("active")[0], "active");
         }
-        addClass(e.target, "active");
+        Util.addClass(e.target, "active");
         if (Object.keys(opacityObj).indexOf(key) > -1) {
             barrageStyle.opacity = opacityObj[key];
         }
@@ -279,14 +312,14 @@ function changeBarrageOpacity(e) {
 function switchVideoBarrage(e) {
     e.stopPropagation();
     if (e.currentTarget.className.indexOf("on") > -1) {
-        removeClass(e.currentTarget, "on");
+        Util.removeClass(e.currentTarget, "on");
         isBarrageOn = false;
         if (barrageUtil) {
             barrageUtil.destroy();
             barrageUtil = null;
         }
     } else {
-        addClass(e.currentTarget, "on");
+        Util.addClass(e.currentTarget, "on");
         isBarrageOn = true;
         if (barrageUtil) {
             barrageUtil.render();
@@ -309,12 +342,18 @@ function changeFullScreenStatus() {
         || document.mozFullScreenElement 
         || document.webkitFullscreenElement;
     if (fullscreenElement) {
-        removeClass(fullscreenToolDIV, "h5-video-fullscreen");
-        addClass(fullscreenToolDIV, "h5-video-mini-screen");
+        Util.removeClass(fullscreenToolDIV, "h5-video-fullscreen");
+        Util.addClass(fullscreenToolDIV, "h5-video-mini-screen");
+        Util.toggleClass(videoTopMenu, true, "flex");
         isFullScreen = true;
     } else {
-        removeClass(fullscreenToolDIV, "h5-video-mini-screen");
-        addClass(fullscreenToolDIV, "h5-video-fullscreen");
+        Util.removeClass(fullscreenToolDIV, "h5-video-mini-screen");
+        Util.addClass(fullscreenToolDIV, "h5-video-fullscreen");
+        Util.toggleClass(videoTopMenu, false, "flex");
+        myVideo.style = "";
+        //暂时先这样处理
+        Util.removeClass(videoSizeTool.getElementsByClassName("active")[0], "active");
+        Util.addClass(videoSizeTool.getElementsByTagName("li")[2], "active");
         isFullScreen = false;
     }
     if (barrageUtil) {
@@ -332,9 +371,9 @@ function changePlayRate(e) {
         myVideo.playbackRate = playbackRate;
         let elm = e.target.parentNode.getElementsByClassName("active");
         if (elm) {
-            removeClass(e.target.parentNode.getElementsByClassName("active")[0], "active");
+            Util.removeClass(e.target.parentNode.getElementsByClassName("active")[0], "active");
         }
-        addClass(e.target, "active");
+        Util.addClass(e.target, "active");
     }
 }
 
@@ -360,11 +399,11 @@ function sendBarrage() {
         return;
     }
     if (val.length > 25) {
-        showMessage("弹幕不能贪多，最多25个字哦~", 2000);
+        Util.showMessage("弹幕不能贪多，最多25个字哦~", 2000);
         return;
     }
     if (!val || val.trim() === "") {
-        showMessage("不能发送空弹幕哦~", 2000);
+        Util.showMessage("不能发送空弹幕哦~", 2000);
         return;
     }
     sendBarrageValue.value = "";
@@ -376,27 +415,27 @@ function sendBarrage() {
         speed: sendStyle.speed
     });
     //弹幕发送间隔为3秒
-    timeCountdown(3, (result)=>{
+    Util.timeCountdown(3, (result)=>{
         sendBarrageBtn.innerText = result + "";
-        addClass(sendBarrageBtn, "disable");
+        Util.addClass(sendBarrageBtn, "disable");
     }, ()=>{
         sendBarrageBtn.innerText = "发送";
-        removeClass(sendBarrageBtn, "disable");
+        Util.removeClass(sendBarrageBtn, "disable");
     });
 }
 
 /**
- * 缓冲中...
+ * 显示loading
  */
-myVideo.onwaiting = () => {
-    toggleClass(videoWaitting, true);
+function showLoading() {
+    Util.toggleClass(videoWaitting, true);
 }
 
 /**
- * 缓冲完成
+ * 隐藏loading
  */
-myVideo.oncanplaythrough = () => {
-    toggleClass(videoWaitting, false);
+function hideLoading() {
+    Util.toggleClass(videoWaitting, false);
 }
 
 /**
@@ -405,7 +444,7 @@ myVideo.oncanplaythrough = () => {
 function go2PosterUrl(e) {
     e = e || window.event;
     if (e.target.className.indexOf("close") > -1) {
-        toggleClass(videoPoster, false);
+        Util.toggleClass(videoPoster, false);
     }
     else {
         window.open("https://www.baidu.com");
@@ -440,21 +479,24 @@ function videoDBClicked(e) {
  * 鼠标移动
  */
 function mouseOverVideo() {
-    toggleClass(videoControl, true);
-    videoContainer.addEventListener("mousemove", mouseInVideo);
+    Util.toggleClass(videoControl, true);
+    isFullScreen && Util.toggleClass(videoTopMenu, true, "flex");
+    Util.addEvent(videoContainer, "mousemove", mouseInVideo);
 }
 
 /**
  * 鼠标移动或静止
  */
 function mouseInVideo(e) {
-    toggleClass(videoControl, true);
+    Util.toggleClass(videoControl, true);
+    isFullScreen && Util.toggleClass(videoTopMenu, true, "flex");
     if (videoControlTimer) {
         clearTimeout(videoControlTimer);
     }
     if (e.target === barrageCanvas && !isChangeVolume && !isChangeProcess && !isSendingBarrage) {
         videoControlTimer = setTimeout(function () {
-            toggleClass(videoControl, false);
+            Util.toggleClass(videoControl, false);
+            isFullScreen && Util.toggleClass(videoTopMenu, false, "flex");
         }, 3000);
     }
 }
@@ -468,7 +510,8 @@ function mouseLeaveVideo() {
     }
     if (!isChangeProcess && !isChangeVolume && !isSendingBarrage) {
         videoControlTimer = setTimeout(function () {
-            toggleClass(videoControl, false);
+            Util.toggleClass(videoControl, false);
+            isFullScreen && Util.toggleClass(videoTopMenu, false, "flex");
         }, 3000);
     }
 }
@@ -477,11 +520,14 @@ function mouseLeaveVideo() {
  * 鼠标在工具栏上
  */
 function showVideoControl() {
-    toggleClass(videoControl, true);
+    Util.toggleClass(videoControl, true);
+    isFullScreen && Util.toggleClass(videoTopMenu, true, "flex");
+    
     if (videoControlTimer) {
         clearTimeout(videoControlTimer);
     }
-    videoControl.addEventListener("mouseleave", hideVideoControl);
+    Util.addEvent(videoControl, "mouseleave", hideVideoControl);
+    isFullScreen && Util.addEvent(videoTopMenu, "mouseleave", hideVideoControl);
 }
 
 /**
@@ -492,7 +538,10 @@ function hideVideoControl() {
         clearTimeout(videoControlTimer);
     }
     videoControlTimer = setTimeout(function () {
-        toggleClass(videoControl, false);
+        Util.toggleClass(videoControl, false);
+        isFullScreen && Util.toggleClass(videoTopMenu, false, "flex");
+        Util.addEvent(videoControl, "mouseleave", hideVideoControl);
+        isFullScreen && Util.addEvent(videoTopMenu, "mouseleave", hideVideoControl);
     }, 3000);
 }
 
@@ -525,15 +574,15 @@ function changeVolumeMute() {
 function updateVolume(volume = 50, muted = false) {
     let delta = volumeSliderDIV.offsetHeight / 2;
     if (volume === 0 || muted) {
-        removeClass(volumeToolDIV, "h5-video-volume-on");
-        addClass(volumeToolDIV, "h5-video-volume-off");
+        Util.removeClass(volumeToolDIV, "h5-video-volume-on");
+        Util.addClass(volumeToolDIV, "h5-video-volume-off");
         volumeSliderDIV.style.top = 100 - delta + "%";
         volumeBgDIV.style.height = 0 + "%";
         volumeValueDIV.innerText = 0 + "%";
     }
     else {
-        removeClass(volumeToolDIV, "h5-video-volume-off");
-        addClass(volumeToolDIV, "h5-video-volume-on");
+        Util.removeClass(volumeToolDIV, "h5-video-volume-off");
+        Util.addClass(volumeToolDIV, "h5-video-volume-on");
         volumeSliderDIV.style.top = 100 - volume - delta + "%";
         volumeBgDIV.style.height = volume + "%";
         volumeValueDIV.innerText = volume + "%";
@@ -563,8 +612,8 @@ function changeVideoVolume(e) {
         updateVolume(videoVolume, videoMuted);
     } else if(e.target === volumeSliderDIV) {
         isChangeVolume = true;
-        addClass(volumeContentDIV, "show");
-        addClass(videoControl, "show");
+        Util.addClass(volumeContentDIV, "show");
+        Util.addClass(videoControl, "show");
         let top = e.clientY - volumeSliderDIV.offsetTop;
         document.onmousemove = VolumeBarDragging.bind(e, top);
         document.onmouseup = VolumeBarUp;
@@ -596,8 +645,8 @@ function VolumeBarDragging(top, e) {
  */
 function VolumeBarUp(e) {
     isChangeVolume = false;
-    // removeClass(videoControl, "show");
-    removeClass(volumeContentDIV, "show");
+    // Util.removeClass(videoControl, "show");
+    Util.removeClass(volumeContentDIV, "show");
     document.onmousemove = null;
     document.onmouseup = null;
 }
@@ -618,9 +667,11 @@ function processMousedown(e) {
     updateCurrentProcess(timeCurrent);
     //拖动时一直显示进度条
     isChangeProcess = true;
-    addClass(processContainerDIV, "process-active");
-    document.onmousemove = processMousemove;
-    document.onmouseup = processMouseup;
+    Util.addClass(processContainerDIV, "process-active");
+    Util.addEvent(document, "mousemove", processMousemove);
+    Util.addEvent(document, "mouseup", processMouseup);
+    // document.onmousemove = processMousemove;
+    // document.onmouseup = processMouseup;
     // document.addEventListener("mousemove", processMousemove);
     // document.addEventListener("mouseup", processMouseup);
 }
@@ -652,8 +703,8 @@ function processMousemove(e) {
     updateCurrentProcess(timeCurrent);
 
     processInfoDIV.style.left = infoLeft / processBarWidth * 100 + "%";
-    processInfoDIV.innerText = formatTime(percentLeft * timeTotal);
-    processContainerDIV.removeEventListener("mousemove", showProcessInfo);
+    processInfoDIV.innerText = Util.formatTime(percentLeft * timeTotal);
+    Util.removeEvent(processContainerDIV, "mousemove", showProcessInfo);
 }
 
 /**
@@ -662,10 +713,12 @@ function processMousemove(e) {
  */
 function processMouseup() {
     isChangeProcss = false;
-    removeClass(processContainerDIV, "process-active");
-    document.onmousemove = null;
-    document.onmouseup = null;
-    processContainerDIV.addEventListener("mousemove", showProcessInfo);
+    Util.removeClass(processContainerDIV, "process-active");
+    // document.onmousemove = null;
+    // document.onmouseup = null;
+    Util.removeEvent(document, "mousemove", processMousemove);
+    Util.removeEvent(document, "mousemove", processMouseup);
+    Util.addEvent(processContainerDIV, "mousemove", showProcessInfo);
 }
 
 /**
@@ -678,7 +731,7 @@ function showProcessInfo(e) {
         infoWidth = processInfoDIV.clientWidth,
         left = getProcessLeft(e),
         infoLeft = (left - infoWidth / 2) / processBarWidth,
-        info = formatTime(left / processBarWidth * timeTotal);
+        info = Util.formatTime(left / processBarWidth * timeTotal);
     if (left < infoWidth / 2) {
         infoLeft = 0;
     }
@@ -710,17 +763,20 @@ function getProcessLeft(e) {
  * 设置视频缓存进度条长度
  */
 function setCacheTime() {
-    let length = myVideo.buffered ? myVideo.buffered.length : 0
-    let end = myVideo.buffered.end(length - 1);
-    if (length && end <= timeTotal) {
-        //调整播放位置后，length可能有多段，这里始终取最后一段
-        timeCache = end;
-        cacheBar.style.width = 100 * (timeCache / timeTotal) + "%";
-    }
-    // 在视频播放期间每500毫秒进行一次递归，重新获取缓存值;
-    // if (timeCache <= timeTotal) {
-    //     setInterval(setCacheTime, 500);
-    // }
+    try {
+        let length = myVideo.buffered ? myVideo.buffered.length : 0
+        let end = myVideo.buffered.end(length - 1);
+        console.log(end);
+        if (length && end <= timeTotal) {
+            //调整播放位置后，length可能有多段，这里始终取最后一段
+            timeCache = end;
+            cacheBar.style.width = 100 * (timeCache / timeTotal) + "%";
+        }
+        // 在视频播放期间每500毫秒进行一次递归，重新获取缓存值;
+        // if (timeCache <= timeTotal) {
+        //     setInterval(setCacheTime, 1000);
+        // }
+    } catch (error) {}
 }
 
 /**
@@ -736,39 +792,39 @@ function updateCurrentProcess(currentTime) {
     }
 }
 
-/**
- * 全屏
- * @param {Element} element  需要全屏的元素
- */
-function fullScreen(element) {
-    var el = element instanceof HTMLElement ? element : document.documentElement;
-    var rfs = el.requestFullscreen       || 
-              el.webkitRequestFullscreen || 
-              el.mozRequestFullScreen    || 
-              el.msRequestFullscreen;
-    if (rfs) {
-        rfs.call(el);
-    } else if (window.ActiveXObject) {
-        var ws = new ActiveXObject("WScript.Shell");
-        ws && ws.SendKeys("{F11}");
-    }
-}
+// /**
+//  * 全屏
+//  * @param {Element} element  需要全屏的元素
+//  */
+// function Util.fullScreen(element) {
+//     var el = element instanceof HTMLElement ? element : document.documentElement;
+//     var rfs = el.requestFullscreen       || 
+//               el.webkitRequestFullscreen || 
+//               el.mozRequestFullScreen    || 
+//               el.msRequestFullscreen;
+//     if (rfs) {
+//         rfs.call(el);
+//     } else if (window.ActiveXObject) {
+//         var ws = new ActiveXObject("WScript.Shell");
+//         ws && ws.SendKeys("{F11}");
+//     }
+// }
 
-/**
- * 退出全屏
- */
-function exitFullscreen(){
-    var efs = document.exitFullscreen       || 
-              document.webkitExitFullscreen || 
-              document.mozCancelFullScreen  || 
-              document.msExitFullscreen;
-    if (efs) {
-        efs.call(document);
-    } else if (window.ActiveXObject) {
-        var ws = new ActiveXObject("WScript.Shell");
-        ws && ws.SendKeys("{F11}");
-    }
-}
+// /**
+//  * 退出全屏
+//  */
+// function Util.exitFullscreen(){
+//     var efs = document.Util.exitFullscreen       || 
+//               document.webkitExitFullscreen || 
+//               document.mozCancelFullScreen  || 
+//               document.msExitFullscreen;
+//     if (efs) {
+//         efs.call(document);
+//     } else if (window.ActiveXObject) {
+//         var ws = new ActiveXObject("WScript.Shell");
+//         ws && ws.SendKeys("{F11}");
+//     }
+// }
 
 /**
  * 全屏或非全屏
@@ -776,36 +832,36 @@ function exitFullscreen(){
  */
 function changeScreenStatus() {
     if (isFullScreen) {
-        exitFullscreen();
-        // removeClass(fullscreenToolDIV, "h5-video-mini-screen");
-        // addClass(fullscreenToolDIV, "h5-video-fullscreen");
+        Util.exitFullscreen();
+        // Util.removeClass(fullscreenToolDIV, "h5-video-mini-screen");
+        // Util.addClass(fullscreenToolDIV, "h5-video-fullscreen");
         // isFullScreen = false;
     } else {
-        fullScreen(videoContainer);
-        // removeClass(fullscreenToolDIV, "h5-video-fullscreen");
-        // addClass(fullscreenToolDIV, "h5-video-mini-screen");
+        Util.fullScreen(videoContainer);
+        // Util.removeClass(fullscreenToolDIV, "h5-video-fullscreen");
+        // Util.addClass(fullscreenToolDIV, "h5-video-mini-screen");
         // isFullScreen = true;
     }
 }
 
-/**
- * 将ms转换成min:seconds格式
- */
-function formatTime(ms) {
-    let mins = Math.floor(ms / 3600.0) * 60.0 + Math.floor(ms % 3600.0 / 60.0),
-        seconds = Math.floor(ms % 60.0);
+// /**
+//  * 将ms转换成min:seconds格式
+//  */
+// function Util.formatTime(ms) {
+//     let mins = Math.floor(ms / 3600.0) * 60.0 + Math.floor(ms % 3600.0 / 60.0),
+//         seconds = Math.floor(ms % 60.0);
     
-    mins = mins < 10 ? "0" + mins : mins;
-    seconds = seconds < 10 ? "0" + seconds : seconds;
-    return mins + ":" + seconds;
-}
+//     mins = mins < 10 ? "0" + mins : mins;
+//     seconds = seconds < 10 ? "0" + seconds : seconds;
+//     return mins + ":" + seconds;
+// }
 
 /**
  * 获取播放视频当前时长
  */
 function setCurrentTime() {
     timeCurrent = myVideo.currentTime;
-    timeCurrentDIV.innerText = formatTime(myVideo.currentTime);
+    timeCurrentDIV.innerText = Util.formatTime(myVideo.currentTime);
     //更新进度条
     updateCurrentProcess();
 }
@@ -821,7 +877,7 @@ function initVideo() {
     volumeSliderDIV.style.top = 100 - videoVolume - volumeSliderDIV.offsetHeight / 2 + "%";
     //初始化视频总时长
     timeTotal = myVideo.duration;
-    timeTotalDIV.innerText = formatTime(timeTotal);
+    timeTotalDIV.innerText = Util.formatTime(timeTotal);
 }
 
 /**
@@ -830,10 +886,10 @@ function initVideo() {
 function changePlayStatus() {
     if (myVideo.paused || myVideo.ended) {
         playVideo();
-        showMessage("播放", 2000);
+        Util.showMessage("播放", 2000);
     } else {
         pauseVideo();
-        showMessage("暂停", 2000);
+        Util.showMessage("暂停", 2000);
     }
 }
 
@@ -842,9 +898,9 @@ function changePlayStatus() {
  */
 function playVideo() {
     myVideo.play();
-    removeClass(playToolDIV, "h5-video-play");
-    addClass(playToolDIV, "h5-video-pause");
-    toggleClass(videoPoster, false);
+    Util.removeClass(playToolDIV, "h5-video-play");
+    Util.addClass(playToolDIV, "h5-video-pause");
+    Util.toggleClass(videoPoster, false);
     if (isBarrageOn) {
         if (!barrageUtil) {
             barrageUtil = new BarrageUtil(
@@ -864,106 +920,11 @@ function playVideo() {
  */
 function pauseVideo() {
     myVideo.pause();
-    removeClass(playToolDIV, "h5-video-pause");
-    addClass(playToolDIV, "h5-video-play");
-    toggleClass(videoPoster, true);
-    toggleClass(videoWaitting, false);
+    Util.removeClass(playToolDIV, "h5-video-pause");
+    Util.addClass(playToolDIV, "h5-video-play");
+    Util.toggleClass(videoPoster, true);
+    Util.toggleClass(videoWaitting, false);
     if (barrageUtil) {
         barrageUtil.stopBarrage();
     }
-}
-
-/**
- * 切换show和hide样式
- * @param {Element} element element
- * @param {Boolean} flag 是否显示
- */
-function toggleClass(element, flag) {
-    if (!element) {
-        return;
-    }
-    let elmClass = element.getAttribute("class") || "";
-    if (flag) {
-        if (elmClass.indexOf("hide") > -1) {
-            elmClass = elmClass.replace("hide", "");
-            elmClass = elmClass.trim();
-        }
-        if (elmClass.indexOf("show") < 0) {
-            elmClass += ` show`;
-        }
-    }
-    else {
-        if (elmClass.indexOf("show") > -1) {
-            elmClass = elmClass.replace("show", "").trim();
-        }
-        if (elmClass.indexOf("hide") < 0) {
-            elmClass += ` hide`;
-        }
-    }
-    element.setAttribute("class", elmClass);
-}
-
-/**
- * 添加样式
- * @param {Element} element element
- * @param {String} 样式名
- */
-function addClass(element, className) {
-    if (!element) {
-        return;
-    }
-    let elmClass = element.getAttribute("class") || "";
-    elmClass = elmClass.trim();
-    if (className && elmClass.indexOf(className) < 0) {
-        elmClass += ` ${className}`;
-    }
-    element.setAttribute("class", elmClass);
-}
-
-/**
- * 移除样式
- * @param {Element} element element
- * @param {String} 样式名
- */
-function removeClass(element, className) {
-    if (!element) {
-        return;
-    }
-    let elmClass = element.getAttribute("class") || "";
-    if (className && elmClass.indexOf(className) > -1) {
-        elmClass = elmClass.replace(className, "").trim();
-    }
-    element.setAttribute("class", elmClass);
-}
-
-/**
- * 发送弹幕倒计时函数
- *
- * @param {Number} seconds 倒计时秒数
- * @param {Function} onCallBack 倒计时执行的方法
- * @param {Function} endCallBack 倒计结束执行的方法
- */
-function timeCountdown(seconds, onCallBack, endCallBack) {
-    if (seconds == 0) {
-        endCallBack();
-    } else { 
-        onCallBack(seconds);
-        seconds --;
-        setTimeout(function() { 
-            timeCountdown(seconds, onCallBack, endCallBack);
-        }, 1000)
-    } 
-}
-
-/**
- * 底部提示信息
- */
-function showMessage(text, interval = 2000) {
-    bottomMessageTimer && clearTimeout(bottomMessageTimer);
-    messageBottom.innerText = text;
-    removeClass(messageBottom, "hide");
-
-    bottomMessageTimer = setTimeout(() => {
-        addClass(messageBottom, "hide");
-    }, interval);
 }
