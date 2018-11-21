@@ -14,7 +14,7 @@
 <body>
     <div class="video-container" tabindex="0">
         <!-- 播放器 -->
-        <video id="myVideo" preload="preload" src="./resources/videos/快把我哥带走.Go.Brother.2018.HD1080P.国语中字.mp4">您的浏览器不支持 video 标签。</video>
+        <video id="myVideo" preload="preload" src="http://pcdownyd.titan.mgtv.com/c1/2018/09/28_0/FB34BA0FBB1B126378F072FA6A8F4DD8_20180928_1_1_588.mp4?arange=0&pm=9lCcPUCwFzJOdxN4UEdBVXwNLgfFZ~JLsKf93gnCyCZp9gsea4rkCAllT7mdSyR49RJedRyEQeJwnjv7aeiFtIANe0pDIEnFeOnyoiXh~EDB~cvqw2ntSd5pPN~Y1mEGmL0L859dwNEZh3WD4Oxfrchh5fQttXZeg6wUdvKXSD32j2UkD89MMQhUyyth44pp1aP2cG4EEYKMFEFx8Rvr2_iCE9cvoWM~66oeztXzUKdVbJ8IqobVFYhnqOW9BPlzR9KyTEkXyDvqTu2BGK8SrRUC6oUTFFhOmM6kRySc4OOuGterSbxZlYkXXyT3nDzLVWiem2j_fDJevI423ywctFIx0bfbwsd1Qr9M6mEkyPUfZ5lcvIvrfKF4e5qFWS_0BTxhuJcSCa3~0Y7OfQL3~pvQSMqURFZNC~BsoQ--&vcdn=0&scid=25009">您的浏览器不支持 video 标签。</video>
         <!-- 弹幕 -->
         <div class="video-barrage">
             <canvas id="barrageCanvas"></canvas>
@@ -22,7 +22,7 @@
         <!-- 暂停海报 -->
         <div class="video-poster">
             <a class="close h5-video-close"></a>
-            <img class="img" src="./resources/images/none.png" alt="">
+            <img class="img" src="./resources/images/ad.jpg" alt="">
         </div>
         <!-- 加载动画 -->
         <div class="video-waitting hide">
@@ -191,7 +191,7 @@
         </div>
         <!-- 顶部菜单 -->
         <div class="video-top-menu hide">
-            <p class="video-title">快把我哥带走</p>
+            <p class="video-title">快把我哥带走.国语中字</p>
             <ul class="video-size">
                 <li>
                     <a class="h5-video-barrage-all"></a>
@@ -221,6 +221,7 @@
 <script>
     window.onload = () => {
         let localTime = document.getElementsByClassName("local-time")[0];
+        localTime.innerHTML = Util.getLocalTime();
         setInterval(() => {
             localTime.innerHTML = Util.getLocalTime();
         }, 1000 * 60)
